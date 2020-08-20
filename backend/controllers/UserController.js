@@ -29,28 +29,46 @@ function saveUser(req, res){
         user.email = params.email;
         user.role = 'ROLE_USER';
         user.image = null;
+        
+        //$or es para que busque si se cumplen las condiciones que le describa
+        User.find({ $or: [ //función para que no se puedan repetir usuarios (user ni email)
+                            {email: user.email.toLowerCase()},
+                            {nick: user.nick.toLowerCase()}
+                            ]}).exec((err, users) => { // función de callback para resolver en ambos casos (true y false)
+                                 if(err) return res.status(500).send({message: 'Error en la petición de usuarios'});
 
-        bcrypt.hash(params.password, null, null, (err, hash) => { //hash es la contraseña generada y err el posible error
-            user.password = hash;
+                                 if(users && users.lenght >= 1){ //Si el usuario es mayor que 1, devolvemos esto:
+                                     return res.status(200).send({message: 'El usuario ya existe, prueba con otro'});
 
-            user.save((err, userStored) => { //función callback para guardar el usuario
-                if(err) return res.status(500).send({message: 'Error al guardar el usuario'});
-                //con este return nos ahorramos tener que anidar más if
+                                 }else{
+                                     //Si el usuario no está repetido, entonces cifrará la contraseña y pasamos a la sig función
 
-                if(userStored){
-                    res.status(200).send({user: userStored}); //para devolver el usuario en caso de que esté almacenado OK
 
-                }else{ //en caso de que no exista ese User almacenado
-                    res.status(404).send({message: 'Usuario no registrado'});
-                }
-            });
-        });
+                                     bcrypt.hash(params.password, null, null, (err, hash) => { //hash es la contraseña generada y err el posible error
+                                        user.password = hash;
 
-    //hacemos un else para el caso de que no nos lleguen todos o haya algún error
+                                        user.save((err, userStored) => { //función callback para guardar el usuario
+                                             if(err) return res.status(500).send({message: 'Error al guardar el usuario'});
+                                             //con este return nos ahorramos tener que anidar más if
+
+                                             if(userStored){
+                                                res.status(200).send({user: userStored}); //para devolver el usuario en caso de que esté almacenado OK
+
+                                             }else{ //en caso de que no exista ese User almacenado
+                                                res.status(404).send({message: 'Usuario no registrado'});
+                                             }
+                                         });
+                                     });
+                                }
+                            });
+        
+
+
+     //hacemos un else para el caso de que no nos lleguen todos o haya algún error
      }else{ //en caso de que todos los parámetros que pusimos en el primer IF no se cumplan
-        res.status(200).send({
-            message: '¡Es imprescindible que rellenes todos los campos!'
-        });
+         res.status(200).send({
+             message: '¡Es imprescindible que rellenes todos los campos!'
+         });
     }
 
 }
