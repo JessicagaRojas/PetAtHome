@@ -16,9 +16,13 @@ function pruebas(req, res){
     });
 }
 
+    //   ------ REGISTRO   ------
+
+
 function saveUser(req, res){
     let params = req.body; //recoge parámetros de POST
     let user = new User(); //variable para crear nuevos usuarios
+
 
     if(params.name && params.surname && params.nick && params.nick && params.email && params.password){
         //si nos llegan todos estos parámetros, pasamos a setear los datos al objeto del usuario
@@ -64,17 +68,45 @@ function saveUser(req, res){
         
 
 
-     //hacemos un else para el caso de que no nos lleguen todos o haya algún error
+     //hacemos un else para el caso de que no nos lleguen todos los parámetros o haya algún error
      }else{ //en caso de que todos los parámetros que pusimos en el primer IF no se cumplan
          res.status(200).send({
              message: '¡Es imprescindible que rellenes todos los campos!'
          });
     }
-
 }
+
+ //   ------ LOGIN   ------
+
+ function loginUser(req, res){
+     let params = req.body; //primero una variable para recoger los datos de POSTMAN
+     let email = params.email;
+     let password = params.password;
+
+     User.findOne({email: email},(err, user) => { //método para buscar una coincidencia en usuarios + emails
+          if(err) return res.status(500).send({message: 'Error'});
+
+          if(user){ //comparar la password con bcrypt
+              bcrypt.compare(password, user.password, (err, check) => {
+                if(check){ //si check es correcto, devolvemos los datos del usuario
+                    return res.status(200).send({user});
+
+
+                }else{ //si el check no encuentra 
+                    return res.status(404).send({message: 'El usuario no se encuentra'});
+                }
+              });
+          }else{
+            return res.status(404).send({message: 'El usuario no se ha podido identificar'});
+
+          }
+     });
+ }
+
 
 module.exports = {
     home,
     pruebas,
-    saveUser
+    saveUser,
+    loginUser
 }
