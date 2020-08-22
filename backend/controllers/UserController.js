@@ -2,6 +2,7 @@
 let bcrypt = require('bcrypt-nodejs'); //requerimos bcrypt para cifrar las contraseñas (token)
 
 let User = require('../models/user'); //cargamos el modelo de usuario. los controladores en mayúsculas
+let jwt = require('../services/token'); //cargamos el fichero del token
 
 function home(req, res){
     res.status(200).send({
@@ -89,7 +90,20 @@ function saveUser(req, res){
           if(user){ //comparar la password con bcrypt
               bcrypt.compare(password, user.password, (err, check) => {
                 if(check){ //si check es correcto, devolvemos los datos del usuario
-                    return res.status(200).send({user});
+
+                    if(params.gettoken){ //devolver token encriptado en caso de true
+
+                        return res.status(200).send({
+                            token: jwt.createToken(user) //le paso el objeto usuario
+                        });
+
+                    }else{
+                        user.password = undefined; //ocultar la password que nos devuelve POSTMAN
+                        return res.status(200).send({user});
+
+                    }
+
+
 
 
                 }else{ //si el check no encuentra 
