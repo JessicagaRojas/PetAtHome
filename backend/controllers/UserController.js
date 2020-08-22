@@ -164,6 +164,48 @@ function saveUser(req, res){
 
   }
 
+  //  ---- ACTUALIZAR DATOS DE USUARIO -----
+
+  function updateUser(req, res){
+      let userId = req.params.id; //Recoge la ID de la URL
+      let update = req.body; //recoge y sustituye los datos nuevos
+      
+      delete update.password; //objeto predeterminado. Borra la propiedad password
+
+      if(userId != req.user.sub){ //si los datos del user no coinciden, no puede identificarse y por lo tanto no puede modificar
+          return res.status(500).send({message: 'No tienes permiso para modificar datos'});
+     }
+
+      User.findByIdAndUpdate(userId, update, {new:true}, (err, userUpdate) => { //si todo va bien
+
+        if(err) return res.status(500).send({message: 'No tienes permiso para modificar datos'});
+
+        if(!userUpdated) return res.status(404).send({message: 'Error not found. No se ha podido actualizar'});
+
+        return res.status(200).send({user: userUpdated}); //si todo va bien, devolvemos el objeto modificado
+
+      });
+
+  }
+
+    //  ---- AVATAR DE USUARIO -----
+
+    function uploadImage(req, res){
+        var userId = req.params.id;
+
+        if(userId != req.user.sub){ //si los datos del user no coinciden, no puede identificarse y por lo tanto no puede subir foto en su perfil
+            return res.status(500).send({message: 'No tienes permiso para subir un avatar'});
+       }
+
+       if(req.files){ //si existe files (fichero) se puede subir
+            let file_path = req.files.image.path;
+            console.log(file_path);
+            let file_split = file_path.split('\\');
+       }
+    }
+
+
+
 
 
 
@@ -173,5 +215,7 @@ module.exports = {
     saveUser,
     loginUser,
     getUser,
-    getUsers
+    getUsers,
+    updateUser,
+    uploadImage
 }
