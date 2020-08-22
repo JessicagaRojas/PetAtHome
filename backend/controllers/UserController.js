@@ -1,5 +1,6 @@
 'use strict'
 let bcrypt = require('bcrypt-nodejs'); //requerimos bcrypt para cifrar las contraseñas (token)
+let mongoosePaginate = require('mongoose-pagination');
 
 let User = require('../models/user'); //cargamos el modelo de usuario. los controladores en mayúsculas
 let jwt = require('../services/token'); //cargamos el fichero del token
@@ -117,10 +118,60 @@ function saveUser(req, res){
      });
  }
 
+ // ---- BUSCAR USUARIOS Y SUS DATOS -----
+
+ function getUser(req, res){ 
+     let userId = req.params.id; //recogemos el ID del usuario. "params" lo usamos para parámetros que nos llegan por URL
+                                 // cuando nos llegan por POST o GET usamos "body"
+    
+    User.findById(userId, (err, user) => { //callback para la consulta a la bbdd
+        if(err) return res.status(500).send({message: 'Error en la petición'});
+
+        if(!user) return res.status(404).send({message: 'El usuario no existe'});
+
+        return res.status(200).send({user}); 
+
+    });
+ }
+
+ //  ---- PAGINATION -----
+
+  function getUsers(req, res){ //Recibe por URL un número de página con los usuarios listados
+    let identity_user_id = req.user.sub; //hace referencia al usuario logeado
+
+    let page = 1;
+
+    if(req.params.page){
+        page = req.params.page;
+    }
+
+    let itemsPerPage = 5; //Cuántos usuarios se van a mostrar por página
+
+    User.find().sort('_id').paginate(page, itemsPerPage, (err, users, total) => { 
+        //el total es un contador que saca el total de registros aunque salgan solo x por página
+
+        if(err) return res.status(500).send({message: 'Error en la petición'});
+
+        if(!users) return res.status(404).send({message: 'Usuarios no encontrados'});
+
+        return res.status(200).send({
+            users,
+            total,
+            pages: Math.ceil(total/itemsPerPage)
+        });
+
+    });
+
+  }
+
+
+
 
 module.exports = {
     home,
     pruebas,
     saveUser,
-    loginUser
+    loginUser,
+    getUser,
+    getUsers
 }
