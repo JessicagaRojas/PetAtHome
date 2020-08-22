@@ -1,6 +1,8 @@
 'use strict'
 let bcrypt = require('bcrypt-nodejs'); //requerimos bcrypt para cifrar las contraseñas (token)
 let mongoosePaginate = require('mongoose-pagination');
+let fs = require('fs'); //librería "file system" de Node para trabajar con archivos (imágenes)
+let path = require('path'); //librería para trabajar con rutas del sistema de ficheros
 
 let User = require('../models/user'); //cargamos el modelo de usuario. los controladores en mayúsculas
 let jwt = require('../services/token'); //cargamos el fichero del token
@@ -193,17 +195,65 @@ function saveUser(req, res){
     function uploadImage(req, res){
         var userId = req.params.id;
 
-        if(userId != req.user.sub){ //si los datos del user no coinciden, no puede identificarse y por lo tanto no puede subir foto en su perfil
-            return res.status(500).send({message: 'No tienes permiso para subir un avatar'});
-       }
-
        if(req.files){ //si existe files (fichero) se puede subir
             let file_path = req.files.image.path;
             console.log(file_path);
             let file_split = file_path.split('\\');
+
+            let file_name = file_split[2];
+
+            let ext_split = file_name.split('\.');
+            let file_ext = ext_split[1]; //El 1 hace referencia a la extensión de la imagen subida
+
+            if(userId != req.user.sub){ //si los datos del user no coinciden, no puede identificarse y por lo tanto no puede subir foto en su perfil
+               return removeFilesOfUploads(file_path, 'No tienes permiso para actualizar los datos'); //llamamos a la función auxiliar definida al final del fichero para eliminar la imagen en caso de no coincidir extensión
+
+            }
+
+            //Si la imagen coincide con las extensiones que detallo abajo, se subirá
+            if(file_text == 'png' || file_ext == 'jpg' || file_ext == 'gif' || file_ext == 'jpeg'){
+
+                User.findByIdAndUpdate(UserId, {image: file_name}, {new:true}, (err, userUpdated) => {
+
+                    if(err) return res.status(500).send({message: 'No tienes permiso para modificar datos'});
+
+                    if(!userUpdated) return res.status(404).send({message: 'Error not found. No se ha podido actualizar'});
+
+                    return res.status(200).send({user: userUpdated}); //si todo va bien, devolvemos el objeto modificado
+
+
+                });
+
+            }else{
+               return removeFilesOfUploads(file_path, 'Extensión no válida'); //llamamos a la función auxiliar definida al final del fichero para eliminar la imagen en caso de no coincidir extensión
+            }
+
+       }else{
+           return res.status(200).send({message: 'No se ha podido subir la imagen'});
        }
     }
 
+    function removeFilesOfUploads(res, file_path, message){
+        fs.unlink(file_path, (err) => { //Para eliminar el fichero si es incorrecto
+            return res.status(200).send({message: message});
+        });
+    }
+
+    //  ---- DEVOLVER IMÁGENES DE USUARIO -----
+
+    function getImageFile(req, res){
+        let image_file = req.params.imageFile; //recibe el método por URL
+        let path_file = './uploads/users/'+image_file;
+
+        fs.exists(path_file, (exists) => {
+            if(exists){
+                res.sendFile(path.resolve(path_file)); //devolver el fichero "en crudo"
+                
+            }else{
+                res.status(200).send({message: 'La imagen no existe'});
+            }
+        });
+    }
 
 
 
@@ -217,5 +267,6 @@ module.exports = {
     getUser,
     getUsers,
     updateUser,
-    uploadImage
+    uploadImage,
+    getImageFile
 }
