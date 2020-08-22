@@ -241,14 +241,14 @@ function saveUser(req, res){
 
     //  ---- DEVOLVER IMÁGENES DE USUARIO -----
 
-    function getImageFile(req, res){
+    function getImageFile(req, res){ //"buscar" "obtener" los avatares de los usuarios
         let image_file = req.params.imageFile; //recibe el método por URL
         let path_file = './uploads/users/'+image_file;
 
-        fs.exists(path_file, (exists) => {
+        fs.exists(path_file, (exists) => { 
             if(exists){
                 res.sendFile(path.resolve(path_file)); //devolver el fichero "en crudo"
-                
+
             }else{
                 res.status(200).send({message: 'La imagen no existe'});
             }
