@@ -188,15 +188,97 @@ function saveUser(req, res){
 
         if(!users) return res.status(404).send({message: 'Usuarios no encontrados'});
 
-        return res.status(200).send({
-            users,
-            total,
-            pages: Math.ceil(total/itemsPerPage)
+        followUsersIds(identity_user_id).then((value) => {
+            return res.status(200).send({
+                users,
+                users_following: value.following,
+                users_follow_me: value.followed,
+                total,
+                pages: Math.ceil(total/itemsPerPage)
+            });
         });
-
     });
 
   }
+
+  //  ---- DEVOLVER ARRAY's de usuarios seguidos y que nos siguen -----
+
+
+ async function followUsersIds(user_id){ //recibe el parámetro de UserId
+    let following = await Follow.find({"user":user_id}).select({'_id':0, '__v':0, 'user':0}).exec((err, follows) => {
+        //En select se definen los campos que no queremos que lleguen, solo nos interesa el Id de usuario que estoy siguiendo como user logeado
+
+        return follows;
+    });
+
+
+    let followed = await Follow.find({"followed":user_id}).select({'_id':0, '__v':0, 'followed':0}).exec((err, follows) => {
+        //En select se definen los campos que no queremos que lleguen, solo nos interesa el Id de usuario que estoy siguiendo como user logeado
+
+        return follows;
+    });
+
+    //PROCESAR FOLLOWING IDs
+
+    let following_clean = [];
+
+    following.forEach((follow) => { 
+        following_clean.push(follow.followed); //Obtener array limpio de Ids
+    });
+
+        //PROCESAR FOLLOWED IDs
+
+    let followed_clean = [];
+
+    followed.forEach((follow) => { 
+        followed_clean.push(follow.user); //Obtener array limpio de Ids
+    });       
+
+    return {
+        following: following_clean,
+        followed: followed_clean
+    }
+ }
+ 
+
+   //  ---- CONTADOR DE USERS -----
+
+
+ function getCounters(req, res){
+    let userId = req.user.sub;
+
+
+     if(req.params.id){
+        userId = req.params.id;
+
+ }
+
+    getCountFollow(userId).then((value) => {
+        return res.status(200).send(value);
+    });
+
+ async function getCountFollow(user_id){
+    let following = await Follow.count({"user":user_id}).exec((err, count) => { //Si el usuario coincide ejectua la consulta y el contador
+        if(err) return handleError(err);
+        return count;
+
+    });
+
+    let followed = await Follow.count({"Followe":user_id}).exec((err, count) => {
+        if(err) return handleError(err);
+        return count;
+    });
+
+    return {
+        following: following,
+        followed: followed
+    }
+
+ }
+
+}
+
+
 
   //  ---- ACTUALIZAR DATOS DE USUARIO -----
 
@@ -298,6 +380,7 @@ module.exports = {
     loginUser,
     getUser,
     getUsers,
+    getCounters,
     updateUser,
     uploadImage,
     getImageFile
