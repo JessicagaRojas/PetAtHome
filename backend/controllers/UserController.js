@@ -5,6 +5,7 @@ let fs = require('fs'); //librería "file system" de Node para trabajar con arch
 let path = require('path'); //librería para trabajar con rutas del sistema de ficheros
 
 let User = require('../models/user'); //cargamos el modelo de usuario. los controladores en mayúsculas
+let Follows = require('../models/follow');
 let jwt = require('../services/token'); //cargamos el fichero del token
 
 function home(req, res){
@@ -131,10 +132,41 @@ function saveUser(req, res){
 
         if(!user) return res.status(404).send({message: 'El usuario no existe'});
 
-        return res.status(200).send({user}); 
-
+            followThisUser(req.user.sub, userId).then((value) => {
+                user.password = undefined; //Para que no devuelva la password en el Json
+                return res.status(200).send({user, 
+                                            following: value.following,
+                                            followed: value.followed}); 
+            });
     });
+
  }
+
+  // ---- FUNCIÓN ASÍNCRONA para saber quién me sigue -----
+
+
+ async function followThisUser(isentity_user_id, user_id){
+    let following = await Follows.findOne({"user":identity_user_id, "followed":user_id}).exec((err, follow) => { //Para comprobar si seguimos a X usuario
+        if(err) return handleError(err);
+       return follow; //Esta variable guarda dentro el resultado que devuelve el findone
+        
+    });
+ 
+ 
+    let followed = await Follows.findOne({"user":user_id, "followed":identity_user_id}).exec((err, follow) => { //Para comprobar si seguimos a X usuario
+        if(err) return handleError(err);
+       return follow; //Esta variable guarda dentro el resultado que devuelve el findOne. Al contrario que la anterior, ahora para saber si me sigue
+        
+    });
+
+    return { //Devolvemos un Json
+        following: following,
+        followed: followed
+    }
+
+ }
+
+
 
  //  ---- PAGINATION -----
 
