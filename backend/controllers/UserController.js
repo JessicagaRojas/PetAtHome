@@ -5,6 +5,7 @@ let fs = require('fs'); //librería "file system" de Node para trabajar con arch
 let path = require('path'); //librería para trabajar con rutas del sistema de ficheros
 
 let User = require('../models/user'); //cargamos el modelo de usuario. los controladores en mayúsculas
+let Follows = require('../models/follow');
 let jwt = require('../services/token'); //cargamos el fichero del token
 
 function home(req, res){
@@ -131,10 +132,41 @@ function saveUser(req, res){
 
         if(!user) return res.status(404).send({message: 'El usuario no existe'});
 
-        return res.status(200).send({user}); 
-
+            followThisUser(req.user.sub, userId).then((value) => {
+                user.password = undefined; //Para que no devuelva la password en el Json
+                return res.status(200).send({user, 
+                                            following: value.following,
+                                            followed: value.followed}); 
+            });
     });
+
  }
+
+  // ---- FUNCIÓN ASÍNCRONA para saber quién me sigue -----
+
+
+ async function followThisUser(isentity_user_id, user_id){
+    let following = await Follows.findOne({"user":identity_user_id, "followed":user_id}).exec((err, follow) => { //Para comprobar si seguimos a X usuario
+        if(err) return handleError(err);
+       return follow; //Esta variable guarda dentro el resultado que devuelve el findone
+        
+    });
+ 
+ 
+    let followed = await Follows.findOne({"user":user_id, "followed":identity_user_id}).exec((err, follow) => { //Para comprobar si seguimos a X usuario
+        if(err) return handleError(err);
+       return follow; //Esta variable guarda dentro el resultado que devuelve el findOne. Al contrario que la anterior, ahora para saber si me sigue
+        
+    });
+
+    return { //Devolvemos un Json
+        following: following,
+        followed: followed
+    }
+
+ }
+
+
 
  //  ---- PAGINATION -----
 
@@ -156,15 +188,97 @@ function saveUser(req, res){
 
         if(!users) return res.status(404).send({message: 'Usuarios no encontrados'});
 
-        return res.status(200).send({
-            users,
-            total,
-            pages: Math.ceil(total/itemsPerPage)
+        followUsersIds(identity_user_id).then((value) => {
+            return res.status(200).send({
+                users,
+                users_following: value.following,
+                users_follow_me: value.followed,
+                total,
+                pages: Math.ceil(total/itemsPerPage)
+            });
         });
-
     });
 
   }
+
+  //  ---- DEVOLVER ARRAY's de usuarios seguidos y que nos siguen -----
+
+
+ async function followUsersIds(user_id){ //recibe el parámetro de UserId
+    let following = await Follow.find({"user":user_id}).select({'_id':0, '__v':0, 'user':0}).exec((err, follows) => {
+        //En select se definen los campos que no queremos que lleguen, solo nos interesa el Id de usuario que estoy siguiendo como user logeado
+
+        return follows;
+    });
+
+
+    let followed = await Follow.find({"followed":user_id}).select({'_id':0, '__v':0, 'followed':0}).exec((err, follows) => {
+        //En select se definen los campos que no queremos que lleguen, solo nos interesa el Id de usuario que estoy siguiendo como user logeado
+
+        return follows;
+    });
+
+    //PROCESAR FOLLOWING IDs
+
+    let following_clean = [];
+
+    following.forEach((follow) => { 
+        following_clean.push(follow.followed); //Obtener array limpio de Ids
+    });
+
+        //PROCESAR FOLLOWED IDs
+
+    let followed_clean = [];
+
+    followed.forEach((follow) => { 
+        followed_clean.push(follow.user); //Obtener array limpio de Ids
+    });       
+
+    return {
+        following: following_clean,
+        followed: followed_clean
+    }
+ }
+ 
+
+   //  ---- CONTADOR DE USERS -----
+
+
+ function getCounters(req, res){
+    let userId = req.user.sub;
+
+
+     if(req.params.id){
+        userId = req.params.id;
+
+ }
+
+    getCountFollow(userId).then((value) => {
+        return res.status(200).send(value);
+    });
+
+ async function getCountFollow(user_id){
+    let following = await Follow.count({"user":user_id}).exec((err, count) => { //Si el usuario coincide ejectua la consulta y el contador
+        if(err) return handleError(err);
+        return count;
+
+    });
+
+    let followed = await Follow.count({"Followe":user_id}).exec((err, count) => {
+        if(err) return handleError(err);
+        return count;
+    });
+
+    return {
+        following: following,
+        followed: followed
+    }
+
+ }
+
+}
+
+
 
   //  ---- ACTUALIZAR DATOS DE USUARIO -----
 
@@ -241,14 +355,14 @@ function saveUser(req, res){
 
     //  ---- DEVOLVER IMÁGENES DE USUARIO -----
 
-    function getImageFile(req, res){
+    function getImageFile(req, res){ //"buscar" "obtener" los avatares de los usuarios
         let image_file = req.params.imageFile; //recibe el método por URL
         let path_file = './uploads/users/'+image_file;
 
-        fs.exists(path_file, (exists) => {
+        fs.exists(path_file, (exists) => { 
             if(exists){
                 res.sendFile(path.resolve(path_file)); //devolver el fichero "en crudo"
-                
+
             }else{
                 res.status(200).send({message: 'La imagen no existe'});
             }
@@ -266,6 +380,7 @@ module.exports = {
     loginUser,
     getUser,
     getUsers,
+    getCounters,
     updateUser,
     uploadImage,
     getImageFile
