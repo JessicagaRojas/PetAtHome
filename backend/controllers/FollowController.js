@@ -84,6 +84,42 @@ function deleteFollow(req, res){
 
     }
 
+    //  ---- LISTAR USUARIOS QUE NOS SIGUEN. PAGINATION -----
+
+    function getFollowedUsers(req, res){
+        let userId = req.user.sub; //lo primero es identificar al usuario 
+
+        if(req.params.id && req.params.page){ //comprobar que nos llega un ID de usuario logeado por URL y un número de páginas
+            userId = req.params.id;
+        }
+
+        let page = 1; //crear variable por defecto 1
+
+        if(req.params.page){ //Si nos llega página por URL...
+            page = req.params.page; //Si nos llega, actualizamos el valor por defecto
+
+        }else{ //Si no existen páginas
+            page = req.params.id;
+
+        }
+
+        let itemsPerPage = 4;
+
+        Follow.find({followed:userId}).populate('user').paginate(page, itemsPerPage, (err, follows, total) => { //Para buscar todos los usuarios que siguen al user registrado
+            if(err) return res.status(500).send({message: 'Error en el servidor'});
+
+            if(!follows) return res.status(404).send({message: 'Todavía no te sigue ningún usuario, ¿por qué no empiezas a seguir tú?'});
+
+            return res.status(200).send({ //en el caso de que todo vaya bien, devolvemos...
+                total: total,
+                pages: Math.ceil(total/itemsPerPage), //Calcula el total de páginas
+                follows //Esto crea la propiedad con toda la info dentro
+            });
+
+        }); 
+
+
+    }
 
 
 
@@ -92,5 +128,6 @@ function deleteFollow(req, res){
 module.exports = {
     saveFollow,
     deleteFollow,
-    getFollowingUsers
+    getFollowingUsers,
+    getFollowedUsers
 }
