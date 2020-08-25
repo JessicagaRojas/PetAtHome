@@ -1,5 +1,14 @@
-'use strict'
+export interface Message {
+    text:string,
+    viewed:string,
+    created_at:string,
+    emitter:string,
+    receiver:string
+   }
 
+
+
+/*
 let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
 let MessageSchema = Schema ({
@@ -13,3 +22,4 @@ let MessageSchema = Schema ({
 });
 
 module.exports = mongoose.model('Message', MessageSchema);
+*/
