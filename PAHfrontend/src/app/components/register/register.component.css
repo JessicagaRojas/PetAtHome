@@ -1,0 +1,74 @@
+.contenedor-form-registro{
+    display:flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    justify-content: center;
+}
+
+.registro-nombre{
+    display: flex;
+    position: absolute;
+    width: 200px;
+    margin-top: 18em;
+    margin-left: 5em;
+}
+
+.registro-email{
+    display: flex;
+    position: absolute;
+    width: 200px;
+    margin-top: 22em;
+    margin-left: 5em;
+}
+
+.registro-password{
+    display: flex;
+    position: absolute;
+    width: 200px;
+    margin-top: 26em;
+    margin-left: 5em;
+}
+
+.boton-submit-registro{
+    display: flex;
+    position: absolute;
+    margin-top: 30em;
+    margin-left: 9.5em;
+    border-radius: 20%;
+    background-color: #512B58;
+    color: lavender;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.boton-submit-registro:hover {
+    background-color: #827397;
+}
+
+
+.contenedor-logo-registro{
+    display:flex;
+    width: 400px;
+    height: 450px;
+    background-color: #222831;
+    opacity: 60%;
+    border-radius: 5%;
+    margin-top: 12em;
+    margin-left: -30em;
+
+}
+
+.lista-registro{
+    width: 300px;
+    color: whitesmoke;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
+    margin-top: 1.5em;
+}
+
+#logo-mapflix-registro{
+    display: flex;
+    position: absolute;
+    margin-top: 23em;
+    margin-left: -10.5em;
+}

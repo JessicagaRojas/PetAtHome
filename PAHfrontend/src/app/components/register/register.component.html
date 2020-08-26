@@ -1,1 +1,69 @@
-<p>register works!</p>
+
+
+<form class="contenedor-form-registro" #registerForm="ngForm" (ngSubmit)="register(registerForm)"> <!-- onsubmit es un método de Angular para pasarle acciones -->
+    <div class="contenedor-logo-registro">
+        <ul class="lista-registro">
+            <li class="lista-registro">Tu alternativa a las residencias de mascotas</li>
+            <li class="lista-registro">Cuidadores de confianza en tu ciudad</li>
+            <li class="lista-registro">Sin jaulas...</li>
+            <li class="lista-registro">...y con mucho amor!</li>
+        </ul>
+     </div>
+
+    <img id="logo-PAH-registro" src="../../../assets/IMG/lofo_PAH.png" alt="" width="800px" height="450px">
+    <h1 class="h1-strong">{{title}}</h1>
+
+     <div class="contenedor-form-registro">
+         <form #registerForm="ngForm" (ngSubmit)="onSubmit()" class="register-form">
+             <p>
+                 <label>Nombre</label>
+                 <input type="text" name="name" #name="ngModel" [(ngModel)]="user.name" class="form-control" required />
+                 <span *ngIf="!name.valid && name.touched">El nombre es obligatorio!</span>
+             </p>
+
+             <p>
+                <label>Apellidos</label>
+                <input type="text" name="surname" #surname="ngModel" [(ngModel)]="user.surname" class="form-control" required />
+                <span *ngIf="!surname.valid && surname.touched">Al menos un apellido es obligatorio!</span>
+             </p>
+
+             <p>
+                <label>Nickname</label>
+                <input type="text" name="nick" #nick="ngModel" [(ngModel)]="user.nick" class="form-control" required />
+                <span *ngIf="!nick.valid && nick.touched">El nick es obligatorio!</span>
+             </p>
+
+             <p>
+                <label>Email</label>
+                <input type="email" name="email" #email="ngModel" [(ngModel)]="user.email" class="form-control" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"/>
+                <span *ngIf="!email.valid && email.touched">El email no es válido!</span>
+             </p>
+
+             <p>
+                <label>Password</label>
+                <input type="text" name="password" #email="ngModel" [(ngModel)]="user.password" class="form-control" required />
+                <span *ngIf="!password.valid && password.touched">La contraseña es obligatoria!</span>
+            </p>
+
+            <input type="submit" value="{{title}}" class="boton-submit-registro" [disabled]="!registerForm.form.valid" />
+         </form>
+     </div>
+
+
+</form>
+
+ <!--
+    <div class="alert alert-danger" *ngIf="errorMsg">{{errorMsg}}</div>
+    <div class="form-registro">
+        <input type="text" class="registro-nombre" name="name" ngModel placeholder="Introduce tu nombre" aria-describedby="emailHelp">
+    </div>
+    <div class="form-registro">
+        <input type="email" email required class="registro-email" name="email" ngModel placeholder="Introduce tu email" required email aria-describedby="emailHelp">
+        <div class="alert alert-danger" *ngIf="registerForm.submitted && registerForm.form.controls.email?.errors?.email"> El email no es válido</div>
+    </div>
+    <div class="form-registro">
+        <input type="password" name="password" ngModel class="registro-password" required placeholder="Introduce tu contraseña">
+    </div>
+    <button type="submit" class="boton-submit-registro" routerLink="/filmslist" routerLinkActive="active-link">Submit</button>
+</form>
+{{registerForm.value | json}} -->
