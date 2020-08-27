@@ -11,7 +11,7 @@
      </div>
 
     <img id="logo-PAH-registro" src="../../../assets/IMG/lofo_PAH.png" alt="" width="800px" height="450px">
-    <h1 class="h1-strong">{{title}}</h1>
+    <h1 class="h1-strong">REGISTRATE!</h1>
 
      <div class="contenedor-form-registro">
          <form #registerForm="ngForm" (ngSubmit)="onSubmit()" class="register-form">
@@ -45,7 +45,7 @@
                 <span *ngIf="!password.valid && password.touched">La contraseña es obligatoria!</span>
             </p>
 
-            <input type="submit" value="{{title}}" class="boton-submit-registro" [disabled]="!registerForm.form.valid" />
+            <input type="submit" value="" class="boton-submit-registro" [disabled]="!registerForm.form.valid" />
          </form>
      </div>
 
