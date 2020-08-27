@@ -23,6 +23,24 @@ export class LoginComponent implements OnInit {
   ) {   }
 
   ngOnInit(): void {
+    console.log('Componente cargando...');
+
+    this.formUser = this.formBuilder.group({
+      nick: ['', Validators.required],
+      role: ['ROLE_USER'],
+      email: ['', Validators.required],
+      password: ['', Validators.required]
+    });
   }
+
+
+
+onSubmit(): {
+  alert("¡Dentro! :D");
+  // Llamar al backend
+  this.userService.(this.formUser.value).subscribe((data) => {
+    console.log(data);
+  });
+}
 
 }

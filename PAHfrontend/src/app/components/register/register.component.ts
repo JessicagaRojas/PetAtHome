@@ -1,51 +1,53 @@
+import { UserService } from './../../services/user.service';
 
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { User } from '../../models/user';
-import { NgForm } from '@angular/forms';
-
-import { UserService } from '../../services/user.service';
+import { NgForm, FormGroup, Validators, FormBuilder } from '@angular/forms';
 
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css'],
-  providers: [UserService]
+  styleUrls: ['./register.component.css']
 })
 
 
 export class RegisterComponent implements OnInit {
-  private user: User; //Creamos el objeto de User para rellenar y modificarlo
-  errorMsg: string; //Definimos el error que dará el input
+  public user: User; //Creamos el objeto de User para rellenar y modificarlo
+  public title: string;
 
+  formUser: FormGroup;
 
   constructor(
     private _route: ActivatedRoute,
     private _router: Router,
-    //public status:string,
-    public userService: UserService  ) {}
+    public userService: UserService,
+    private formBuilder: FormBuilder
+  ) {
+    this.title = 'Regístrate!';
+  }
 
   ngOnInit(): void {
     console.log('Componente cargando...');
+
+    this.formUser = this.formBuilder.group({
+      name: ['', Validators.required],
+      surname: ['', Validators.required],
+      nick: ['', Validators.required],
+      role: ['ROLE_USER'],
+      email: ['', Validators.required],
+      password: ['', Validators.required]
+    });
+
   }
 
-  register(registerForm: NgForm): void {
-    console.log(registerForm);
-    if (!registerForm.valid) { //Si el registro NO es válido...
-      setTimeout(() => this.errorMsg = '', 2500); //...tras 2.5seg salta error
-      this.errorMsg = 'Revisa tus campos';
-      return;
-    }
-    const user: User = registerForm.value; // "user" recoge todo lo que hay en el modelo de User (id, name, email, password)
-    this.userService.register(user)  // Registra esos valores
-      .subscribe(console.log); //Imprescindible 
-  }
-
-
-  onSubmit(){ //Cuando clickamos el botón Submit en html, se inicia este método que conecta con el service, guarda los datos y de ahí al API
-    this.user.role = "ROLE_USER";
-    this.userService.register(this.user);
+  onSubmit() {
+    alert("¡Gracias por registrarte!");
+    // Llamar al backedn
+    this.userService.register(this.formUser.value).subscribe((data) => {
+      console.log(data);
+    });
   }
 
 }

@@ -1,24 +1,35 @@
-<form class="contenedor-login" #loginForm="ngForm" (ngSubmit)="onSubmit">
-    <div class="contenedor-logo-inicio">
-        <ul class="lista-login">
-            <li class="lista-login">¡Bienvenido de nuevo!</li>
-            <li class="lista-login">Cuida, acoge...y disfruta! :D</li>
-       </ul>
-     </div>
-     <img id="logo-PAH-registro" src="../../../assets/IMG/lofo_PAH.png" alt="" width="800px" height="450px">
-     <h1 class="h1-strong">Ingresa!</h1>
+    <mat-card>
+    <form [formGroup]="formUser" class="login-form">
 
+        <div>
+            <mat-form-field class="example-form-field">
+                <mat-label>Nickname</mat-label>
+                <input matInput type="text" formControlName="nick" required>
+            </mat-form-field>
+            <span *ngIf="!formUser.controls.nick.valid && formUser.controls.nick.touched">El nick es
+                obligatorio!</span>
+        </div>
 
-     <div class="contenedor-email-login">
-        <p>
-            <label>Email</label>
-            <input type="email" name="email" #email="ngModel" [{ngModel}]="user.email" required required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"/>
-            <span></span>
-        </p>
+        <div>
+        <mat-form-field class="example-form-field">
+            <mat-label>Email</mat-label>
+            <input matInput type="text" formControlName="email" required
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
+        </mat-form-field>
+        <span *ngIf="!formUser.controls.email.valid && formUser.controls.email.touched">El email no es
+            válido!</span>
+    </div>
 
+    <div>
+        <mat-form-field class="example-form-field">
+            <mat-label>Password</mat-label>
+            <input matInput type="text" formControlName="password" required>
+        </mat-form-field>
+        <span *ngIf="!formUser.controls.password.valid && formUser.controls.password.touched">La contraseña es
+            obligatoria!</span>
+    </div>
 
-     </div>
+        <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!formUser.valid">Enviar</button>
 
-
-    
-</form>
+    </form>
+</mat-card>
