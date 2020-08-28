@@ -53,9 +53,10 @@ export class LoginComponent implements OnInit {
     // Llamar al backend
     this.userService.signup(this.formLogin.value).subscribe((data) => {
       console.log(data);
+      this.identity = data.user;
+
     });
 
-     this.identity = response.user;
 
 
       if(!this.identity || !this.identity._id){

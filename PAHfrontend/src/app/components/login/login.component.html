@@ -6,7 +6,7 @@
                 <mat-label>Nickname</mat-label>
                 <input matInput type="text" formControlName="nick" required>
             </mat-form-field>
-            <span *ngIf="!formUser.controls.nick.valid && formUser.controls.nick.touched">El nick es
+            <span *ngIf="!formLogin.controls.nick.valid && formLogin.controls.nick.touched">El nick es
                 obligatorio!</span>
         </div>
 
@@ -16,7 +16,7 @@
             <input matInput type="text" formControlName="email" required
                 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
         </mat-form-field>
-        <span *ngIf="!formUser.controls.email.valid && formUser.controls.email.touched" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">El email no es válido!</span>
+        <span *ngIf="!formLogin.controls.email.valid && formLogin.controls.email.touched" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">El email no es válido!</span>
     </div>
 
     <div>
@@ -24,10 +24,10 @@
             <mat-label>Password</mat-label>
             <input matInput type="text" formControlName="password" required>
         </mat-form-field>
-        <span *ngIf="!formUser.controls.password.valid && formUser.controls.password.touched">La contraseña es obligatoria!</span>
+        <span *ngIf="!formLogin.controls.password.valid && formLogin.controls.password.touched">La contraseña es obligatoria!</span>
     </div>
 
-        <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!formUser.valid">Enviar</button>
+        <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!formLogin.valid">Enviar</button>
 
     </form>
 </mat-card>

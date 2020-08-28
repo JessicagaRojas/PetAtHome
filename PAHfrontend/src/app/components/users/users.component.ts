@@ -122,7 +122,9 @@ export class UsersComponent implements OnInit { //propiedades
     //
 
     followUser(followed){
-      let follow = new Follow('', this.identity._id, followed); //'' id vacío + id usuario logeado
+      let follow: Follow;
+      follow.user = null;
+      follow.followed = followed;
 
       this.followService.addFollow(this.token, follow).subscribe(
           response => {

@@ -4,7 +4,7 @@ let express = require('express');
 let UserController = require('../controllers/UserController');
 let middleware_auth = require('../middlewares/auth');
 
-let multipart = require('connect-multiparty'); 
+let multipart = require('connect-multiparty'); //Para subir ficheros
 let md_upload = multipart({uploadDir: './uploads/users'}); //md = middleware
 
 

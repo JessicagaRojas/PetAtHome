@@ -9,7 +9,9 @@ let app = express(); //instancia que llama al framework express
 
 //-----Cargar rutas
 let user_routes = require('./routes/users');
+let publication_routes = require('./routes/publications');
 let follow_routes = require('./routes/follows');
+
 
 //Cargar middlewares. métodos que se ejecutan antes de que la petición se ejecute.
 app.use(bodyParser.urlencoded({extended:false})); //Config obligatoria de body parser
@@ -18,6 +20,7 @@ app.use(bodyParser.json()); //convierte lo del body a Json
 
 //-----rutas
 app.use('/api', user_routes);
+app.use('/api', publication_routes);
 app.use('/api', follow_routes);
 
 

@@ -35,7 +35,7 @@ export class FollowService {
       let headers = new HttpHeaders().set('Content-Type', 'application/json')
                                       .set('Authorization', token);
 
-      return this.httpClient.delete(this.url + 'follow', id, {headers: headers});
+      return this.httpClient.delete(this.url + 'follow/' + id, {headers: headers}); //follow + id como parámetro
 
     }
 
