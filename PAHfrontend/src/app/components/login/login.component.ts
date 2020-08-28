@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { NgForm, FormGroup, Validators, FormBuilder } from '@angular/forms';
 //import { Credentials } from '../../interfaces/credentials';
+import { HttpClientModule, HttpHeaders, HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+
+
 
 import { User } from '../../models/user';
 import { UserService } from '../../services/user.service';
@@ -14,6 +18,7 @@ import { UserService } from '../../services/user.service';
 
 export class LoginComponent implements OnInit {
     public user:User;
+    public url: string;
     public identity;
     public token;
 
@@ -25,8 +30,9 @@ export class LoginComponent implements OnInit {
     private formBuilder: FormBuilder,
     private _route: ActivatedRoute,
     private _router: Router,
+    private httpClient: HttpClient,
 
-  ) {   }
+  ) { this.url = environment.url;}
 
   ngOnInit(): void {
     console.log('Componente cargando...');
@@ -88,8 +94,12 @@ error => {
 
           //Redirección a la home tras logout
           this._router.navigate(['/']);
+    }
   }
-},
+)}
+}
+
+
 /*
 error => {
   var errorMessage = <any>error;
@@ -122,6 +132,4 @@ this.userService.signup(this.user).subscribe(
     }
   }
   this.status = 'success';
-)
-
-*/
+ */

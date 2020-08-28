@@ -29,7 +29,7 @@ export class UserService {
   }
 
     // ---- LOGIN ----
-  signup(user:User, gettoken = null): Observable<any>{ //Saca el token del usuario identificado contra el Api en cada de las peticiones
+  signup(user, gettoken = null): Observable<any>{ //Saca el token del usuario identificado contra el Api en cada de las peticiones
     if(gettoken != null){
     user.gettoken = gettoken;
     }
@@ -66,7 +66,7 @@ export class UserService {
     }else{
       this.token = null;
     }
-    return this.token;
+    return this.token
   }
 
 }

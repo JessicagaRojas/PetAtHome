@@ -1,4 +1,10 @@
 import { UserService } from './../../services/user.service';
+import { environment } from '../../../environments/environment';
+import { Injectable } from '@angular/core';
+import { HttpClientModule, HttpHeaders, HttpClient } from '@angular/common/http';
+
+
+
 
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
@@ -14,18 +20,22 @@ import { NgForm, FormGroup, Validators, FormBuilder } from '@angular/forms';
 
 
 export class RegisterComponent implements OnInit {
+  public url: string;
   public user: User; //Creamos el objeto de User para rellenar y modificarlo
   public title: string;
 
   formUser: FormGroup;
 
   constructor(
+    private httpClient: HttpClient,
     private _route: ActivatedRoute,
     private _router: Router,
     public userService: UserService,
     private formBuilder: FormBuilder
   ) {
     this.title = 'Regístrate!';
+    this.url = environment.url;
+
   }
 
   ngOnInit(): void {

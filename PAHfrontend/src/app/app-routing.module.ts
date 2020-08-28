@@ -6,6 +6,8 @@ import { ModuleWithProviders } from '@angular/core';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { HomeComponent } from './components/home/home.component';
+import { UsersComponent } from './components/users/users.component';
+import { Error404Component } from './components/error404/error404.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -14,6 +16,10 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'follow', component: RegisterComponent },
   { path: 'seguidos', component: RegisterComponent },
+  { path: 'gente', component: UsersComponent },
+  { path: '**', component: Error404Component },
+
+
   
 ];
 
