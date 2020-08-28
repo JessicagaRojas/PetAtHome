@@ -7,6 +7,8 @@ import { environment } from '../../../environments/environment';
 
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user';
+import { Follow } from '../../models/follow';
+import { FollowService } from '../../services/follow.service';
 
 @Component({
   selector: 'app-users',
@@ -15,7 +17,7 @@ import { User } from '../../models/user';
 })
 
 
-export class UsersComponent implements OnInit {
+export class UsersComponent implements OnInit { //propiedades
   public url: string;
   public title: string;
   public identity;
@@ -26,6 +28,7 @@ export class UsersComponent implements OnInit {
   public total;
   public pages;
   public users: User[];
+  public follows; //Aquí guardamos los usuarios que estamos siguiendo
   public status: string;
 
 
@@ -33,7 +36,8 @@ export class UsersComponent implements OnInit {
     private httpClient: HttpClient,
     private _route: ActivatedRoute,
     private _router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private followService: FollowService
 
 
   ) { 
@@ -92,6 +96,9 @@ export class UsersComponent implements OnInit {
           this.total = response.total; //Estos elementos están dentro del array User
           this.users = response.users;
           this.pages = response.pages;
+          this.follows = response.users_following;
+
+          console.log(this.follows); //aquí dentro ya está el array con los usuarios que sigo
 
           if(page > this.pages){ //Si metemos una página que no existe (como usuarios) nos lleva a la pag1 
             this._router.navigate(['/gente',1]);
@@ -110,5 +117,61 @@ export class UsersComponent implements OnInit {
     );
 
   }
+
+
+    //
+
+    followUser(followed){
+      let follow = new Follow('', this.identity._id, followed); //'' id vacío + id usuario logeado
+
+      this.followService.addFollow(this.token, follow).subscribe(
+          response => {
+            if (!response.follow){
+              this.status = 'error';
+
+            }else{
+              this.status = 'success';
+              this.follows.push(followed); //añadimos nuevo id al array + followed (id de usuario que acabamos de seguir)
+            }
+
+          },
+          error => {
+            let errorMessage = <any>error; //Guardamos en esta variable el error y lo mostramos por consola
+        console.log(errorMessage);
+
+        if(errorMessage != null){
+          this.status = 'error';
+        }
+
+        }
+      );
+    }
+
+    // ---- Dejar de seguir ----
+
+    unfollowUser(followed){
+      this.followService.deleteFollow(this.token, followed).subscribe(
+        response => {
+
+          let search = this.follows.indexOf(followed); //Busca followed en el array de follows
+            if(search != -1){ //Si la búsqueda es diferente a -1...
+              this.follows.splice(search, 1);  //...elimina el elemento
+
+            }
+
+
+        },
+        error => {
+          let errorMessage = <any>error; //Guardamos en esta variable el error y lo mostramos por consola
+          console.log(errorMessage);
+  
+          if(errorMessage != null){
+            this.status = 'error';
+          }
+        }
+      );
+    }
+
+
 
 }

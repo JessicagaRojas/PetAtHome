@@ -23,6 +23,15 @@
                 </div>
                 <!--Añadir botones follow-->
 
+                <div class="pull-right" *ngIf="user._id != identity._id" > <!-- Añadimos condición para que no aparezca opción de seguirnos a nosotros mismos-->
+                    <button class="btn btn-success" *ngIf="follows.indexOf(user._id) < 0" (click)="followUser(user._id)" >Seguir</button>
+                    <button class="btn btn-default">Siguiendo</button>
+
+                    <button class="btn btn-primary" *ngIf="follows.indexOf(user._id) >= 0" (click)="unfollowUser(user.id)" >Dejar de seguir</button>
+
+               </div>
+
+
             </div>
 
         </div>
