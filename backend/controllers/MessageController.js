@@ -19,6 +19,7 @@ function saveMessage(req, res){
     message.emitter = req.user.sub; //emitter es el usuario que está logeado
     message.receiver = params.receiver;
     message.text = params.text;
+    message.viewed = 'false';
 
     message.created_at = moment().unix(); //Guarda las fechas de emisión con la librería moment, en formato unix
 
@@ -43,7 +44,33 @@ function saveMessage(req, res){
 
         let itemsPerPage = 5; //Mensajes que se van a mostrar por página
 
-        Message.find({receiver: userId}).populate('emitter').paginate(page, itemsPerPage, (err, messages, total) => { //populate del usuario que ha enviado el/los mensaje. El emitter
+        Message.find({receiver: userId}).populate('emitter', 'name surname image nick _id').paginate(page, itemsPerPage, (err, messages, total) => { //populate del usuario que ha enviado el/los mensaje. El emitter. Además seleccionamos los parámatros que queremos que devuelva
+                    //receiver porque buscamos los mensajes que hemos recibido como usuario logeado
+            if(err) return res.status(500).send({message: 'Error en la petición'});
+
+            if(!messages) return res.status(404).send({message: 'Messages not found'});
+
+            return res.status(200).send({ //en el caso de que nos devuelva los mensajes OK, enviamos un objeto con total items, total páginas y los mensajes
+                total: total,
+                pages: Math.ceil(total/itemsPerPage), //Divido la cantidad de elementos por números de elementos por página, para obtener la mitad
+                messages
+            });
+        });
+    }
+
+      // ---Listar mensajes enviados----
+
+      function getEmmitedMessages(req, res){
+        let userId = req.user.sub; //Primero recogemos el id del usuario que está logeado
+
+        var page = 1; //La página empieza por 1 por defecto
+        if(req.params.page){ 
+            page = req.params.page; //si nos llegan parámetros, actualizamos la info y lo igualamos a las páginas que sean
+        }
+
+        let itemsPerPage = 5; //Mensajes que se van a mostrar por página
+
+        Message.find({emitter: userId}).populate('emitter receiver', 'name surname image nick _id').paginate(page, itemsPerPage, (err, messages, total) => { //populate del usuario que ha enviado el/los mensaje. El emitter. Además seleccionamos los parámatros que queremos que devuelva
                     //receiver porque buscamos los mensajes que hemos recibido como usuario logeado
             if(err) return res.status(500).send({message: 'Error en la petición'});
 
@@ -58,8 +85,41 @@ function saveMessage(req, res){
     }
 
 
+    // ----Obtener Mensajes NO LEIDOS ----
+
+    function getUnviewedMessages(req, res){
+        let userId = req.user.sub; //Primero recogemos el userId logeado
+
+        Message.count({receiver:userId, viewed: 'false'}).exec((err, count) => { //Cuando el receiver sea el usuario y cuando viewed sea false, ejecutamos...
+            if(err) return res.status(500).send({message: 'Error en la petición'});
+
+            return res.status(200).send({ //Enviamos un objeto con el valor de count, para un contador de los mensajes no leídos 
+                'unviewed': count
+            });
+        });
+    }
+
+    // ---Marcar mensajes como leídos ---
+
+    function setMarkAsRead(req, res){
+        let userId = req.user.sub; //Primero recogemos el usuario logeado
+
+        Message.update({receiver:userId, viewed:'false'}, {viewed:'true'}, {'multi':true}, (err, messageUpdated) => { //con el multi los actualizamos todos los documentos a la vez
+                                 //este segundo parámetro para actualizar los datos solo del documento viewed
+            if(err) return res.status(500).send({message: 'Error en la petición'});
+
+            return res.status(200).send({
+                messages: messagesUpdated
+            });
+        });
+
+    }
+
 
 module.exports = {
     saveMessage,
-    getReceivedMessages
+    getReceivedMessages,
+    getEmmitedMessages,
+    getUnviewedMessages,
+    setMarkAsRead
 }

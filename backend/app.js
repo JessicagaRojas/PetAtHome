@@ -17,7 +17,18 @@ let message_routes = require('./routes/messages');
 //Cargar middlewares. métodos que se ejecutan antes de que la petición se ejecute.
 app.use(bodyParser.urlencoded({extended:false})); //Config obligatoria de body parser
 app.use(bodyParser.json()); //convierte lo del body a Json
-//cors
+
+// configurar cabeceras http con peticiones predeterminadas del CORS
+//Esto equivale a crear el middleware (es un middleware)
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+ 
+    next();
+});
+
 
 //-----rutas
 app.use('/api', user_routes);
