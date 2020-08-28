@@ -13,7 +13,7 @@ let PublicationController = require('../controllers/Publication');
 api.get('/probando-pub', middleware_auth.ensureAuth, PublicationController.probando);
 api.post('/publication', middleware_auth.ensureAuth, PublicationController. savePublication);
 api.get('/publications/:page?', middleware_auth.ensureAuth, PublicationController.getPublications);
-
+api.get('/publication/:id', middleware_auth.ensureAuth, PublicationController.getOnePublication);
 
 
 

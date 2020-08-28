@@ -79,7 +79,21 @@ function savePublication(req, res){
           }); 
         });
 
+    }
 
+  // ---- Buscar publicaciones por id ----
+
+    function getOnePublication(req, res){ 
+        let publicationId = req.params.id; //Recogemos el id que nos llega por URL
+
+        Publication.findById(publicationId, (err, publication) => { 
+            if(err) return res.status(500).send({message: 'Error al devolver las publicaciones'});
+
+            if(!publication) return res.status(404).send({message: 'Publications not found'});
+
+
+            return res.status(200).send({publication});
+        });
     }
 
 
@@ -87,5 +101,6 @@ function savePublication(req, res){
 module.exports = {
     probando,
     savePublication,
-    getPublications
+    getPublications,
+    getOnePublication
 }
