@@ -97,10 +97,28 @@ function savePublication(req, res){
     }
 
 
+    // --- BORRAR publicaciones ----
+
+
+    function deletePublication(req,res){
+        let publicationId = req.params.id;
+
+        Publication.find({'user': req.user.sub, '_id': publicationId}).remove(err => { //métodos propios de mongoose
+                        //({'user': req.user.sub, '_id': publicationId}) -> Solo puede borrar publicaciones el usuario que las ha creado y esté identificado
+            if(err) return res.status(500).send({message: 'Error al borrar'});
+
+            if(!publicationRemoved) return res.status(404).send({message: 'No se ha podido borrar'});
+
+            return res.status(200).send({message: 'Publicación eliminada'});
+
+        });
+    }
+
 
 module.exports = {
     probando,
     savePublication,
     getPublications,
-    getOnePublication
+    getOnePublication,
+    deletePublication
 }
