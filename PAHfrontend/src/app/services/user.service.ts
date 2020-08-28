@@ -37,7 +37,7 @@ export class UserService {
     let params = JSON.stringify(user); //convertir el usuario en string
     let headers = new HttpHeaders().set('Content-Type', 'application/json'); //Para definir las cabeceras
 
-    return this._http.post(this.url+'login', params, {headers: headers});
+    return this.httpClient.post<User>(this.url + 'login', params, {headers: headers}); //Petición por POST al backend + guardado de estos parámetros
   }
 
  // --- Sacar la info del usuario del localStorage, utilizando el servicio ----
@@ -68,5 +68,24 @@ export class UserService {
     }
     return this.token
   }
+
+  // ---- Obtener usuarios ----
+
+  getUsers(page = null):Observable<any>{ //petición a la API del paginator. Traer lista de usuarios 
+    let headers = new HttpHeaders().set('Content-type', 'application/json')
+                                  .set('Authorization', this.getToken());
+
+      return this.httpClient.get<User>(this.url + 'users/' + page, {headers: headers});
+  }
+
+
+  getUser(id):Observable<any>{ //petición a la API para sacar UN solo usuario (lo usamos en los perfiles)
+    let headers = new HttpHeaders().set('Content-type', 'application/json')
+                                  .set('Authorization', this.getToken());
+
+      return this.httpClient.get<User>(this.url + 'user/' + id, {headers: headers});
+  }
+
+
 
 }

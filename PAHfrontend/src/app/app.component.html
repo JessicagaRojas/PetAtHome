@@ -18,6 +18,11 @@
   <ul class="nav navbar-nav navbar-right" *ngIf="identity"> <!--Esta barra solo aparece si el usuario está identificado-->
     <li class="avatar">
       <!--cargar imagen de usuario-->
+      <a [routerLink]="['/home']" [routerLinkActive]="['active']" >Inicio</a> <!--añadir iconos-->
+      <a href="#" >Timeline</a> <!--añadir iconos-->
+      <a [routerLink]="['/gente']" [routerLinkActive]="['active']" >Gente</a> <!--añadir iconos-->
+
+
 
     </li>
 
@@ -28,7 +33,7 @@
 
       <ul class="dropdown-menu">
         <li>
-          <a href="#">Mi perfil</a> <!--añadir iconos-->
+          <a [routerLink]="['']" [routerLinkActive]="['']" >Mi perfil</a> <!--añadir iconos-->
           <a href="#">Mis datos</a>
           <a class="pointer" (click)="logout()" href="#">Cerrar sesión</a>
 

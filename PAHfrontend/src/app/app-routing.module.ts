@@ -16,7 +16,8 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'follow', component: RegisterComponent },
   { path: 'seguidos', component: RegisterComponent },
-  { path: 'gente', component: UsersComponent },
+  { path: 'gente', component: UsersComponent }, //La misma ruta de gente pero sin parámetro
+  { path: 'gente:page', component: UsersComponent },
   { path: '**', component: Error404Component },
 
 

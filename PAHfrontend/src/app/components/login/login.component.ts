@@ -19,8 +19,10 @@ import { UserService } from '../../services/user.service';
 export class LoginComponent implements OnInit {
     public user:User;
     public url: string;
+    public status: string;
     public identity;
     public token;
+
 
     formLogin: FormGroup;
 

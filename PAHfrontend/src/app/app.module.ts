@@ -17,8 +17,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatIconModule } from '@angular/material/icon';
 import { HomeComponent } from './components/home/home.component';
 import { UsersComponent } from './components/users/users.component';
-import { ErrorComponentComponent } from './components/error-component/error-component.component';
-import { ErrorComponent } from './components/error/error.component';
 import { Error404Component } from './components/error404/error404.component';
 
 @NgModule({
@@ -28,8 +26,6 @@ import { Error404Component } from './components/error404/error404.component';
     RegisterComponent,
     HomeComponent,
     UsersComponent,
-    ErrorComponentComponent,
-    ErrorComponent,
     Error404Component
   ],
   imports: [
