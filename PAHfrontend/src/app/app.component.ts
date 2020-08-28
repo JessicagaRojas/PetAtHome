@@ -1,4 +1,5 @@
 import { Component, OnInit, DoCheck } from '@angular/core';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { UserService } from './services/user.service';
 
 @Component({
@@ -15,6 +16,8 @@ export class AppComponent implements OnInit, DoCheck{
 
   constructor(
     public userService: UserService,
+    private _route: ActivatedRoute,
+    private _router: Router
   ){
   this.title = 'PetAtHome'
   }
@@ -26,6 +29,14 @@ export class AppComponent implements OnInit, DoCheck{
 
   ngDoCheck(){
     this.identity = this.userService.getIdentity(); //Cada vez que haya cambios de identificación, actualiza la lógica
+  }
+
+  // ---- LOGOUT ----
+
+  logout(){
+    localStorage.clear(); //Borramos los parámetros almacenador el LS
+    this.identity = null;
+    this._router.navigate(['/']);
   }
 
 }

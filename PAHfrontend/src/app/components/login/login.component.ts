@@ -85,6 +85,9 @@ error => {
           localStorage.setItem('token',this.token); //En LocalStorage no puedes guardar objetos de JS, hay que convertirlo en Json string
 
           this.getToken(); //Conseguir token mediante petición AJAX
+
+          //Redirección a la home tras logout
+          this._router.navigate(['/']);
   }
 },
 /*

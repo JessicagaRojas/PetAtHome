@@ -14,5 +14,32 @@
   </button>
 </mat-toolbar>
 
+<div>
+  <ul class="nav navbar-nav navbar-right" *ngIf="identity"> <!--Esta barra solo aparece si el usuario está identificado-->
+    <li class="avatar">
+      <!--cargar imagen de usuario-->
+
+    </li>
+
+    <li class="dropdown">
+      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+        {{identity.name}} <span class="caret"></span>
+      </a>
+
+      <ul class="dropdown-menu">
+        <li>
+          <a href="#">Mi perfil</a> <!--añadir iconos-->
+          <a href="#">Mis datos</a>
+          <a class="pointer" (click)="logout()" href="#">Cerrar sesión</a>
+
+
+        </li>
+        
+      </ul>
+
+    </li>
+  </ul>
+</div>
+
 
 <router-outlet></router-outlet>
