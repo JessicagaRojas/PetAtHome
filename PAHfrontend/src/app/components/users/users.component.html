@@ -1,4 +1,40 @@
 <div>
     <h1 class="h1-strong">{{title}}</h1>
+
+    <div class="gente">
+        <!--LISTADO-->
+        <div class="item-usuario" *ngFor="let user of users"> <!--Esto crea un div por cada usuario que tenga en mi array-->
+            <div class="panel panel-default">
+
+                <div class="panel-body">
+
+                    <div class="image_user pull-left"> <!--Para recoger los avatares-->
+                        <a href="#">
+                            <img src="{{url + 'get-image-user/' + user.image }}" *ngIf="user.image" />
+                            <img class="avatar-default" src="../../../assets/IMG/user_default.png" *ngIf="!user.image" /> <!--En el caso de que el usuario no tenga avatar-->
+
+                        </a>
+                    </div>
+                <div class="user_name pull-left"> <!--panel de bootstrap-->
+                    <a href="#">
+                    {{user.name + ' ' + user.surname}} | {{user.nick}}
+                    </a>
+                </div>
+                </div>
+                <!--Añadir botones follow-->
+
+            </div>
+
+        </div>
+
+<!--PAGINATOR-->
+
+        <ul class="pagination pull-right">
+            <li *ngIf="page > 1"><a [routerLink]="['gente', prev_page]">Anterior</a></li>
+            <li *ngIf="pages != page"><a [routerLink]="['gente', next_page]">Siguiente</a></li>
+
+        </ul>
+
+    </div>
     
 </div>

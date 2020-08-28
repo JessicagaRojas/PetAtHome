@@ -58,6 +58,11 @@ export class UsersComponent implements OnInit {
       let page = + params['page']; //Recogemos el parámetro en la variable page, convirtiéndolo en entero con el símbolo +
       this.page = page; //Devuelve la página a la vista
 
+      if(!params['page']){ //Si no hay parámetros muestra 1
+        page = 1;
+      }
+
+
       if(!page){ //si no existen páginas, mostrará solo 1
         page = 1;
 
