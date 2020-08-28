@@ -60,7 +60,7 @@ export class LoginComponent implements OnInit {
         //TOKEN
         this.getToken();
   }
-},
+}
 /*
 error => {
   var errorMessage = <any>error;
@@ -87,6 +87,7 @@ error => {
           this.getToken(); //Conseguir token mediante petición AJAX
   }
 },
+/*
 error => {
   var errorMessage = <any>error;
   console.log(errorMessage);
@@ -99,7 +100,7 @@ error => {
   };
 
 }
-
+*/
 
 
 /*
