@@ -10,8 +10,9 @@ let PublicationController = require('../controllers/Publication');
 
 // ---- RUTAS ----
 
-api.get('/probando-pub', middleware_auth, PublicationController.probando);
-api.post('/publication', middleware_auth, PublicationController, savePublication);
+api.get('/probando-pub', middleware_auth.ensureAuth, PublicationController.probando);
+api.post('/publication', middleware_auth.ensureAuth, PublicationController. savePublication);
+api.get('/publications/:page?', middleware_auth.ensureAuth, PublicationController.getPublications);
 
 
 

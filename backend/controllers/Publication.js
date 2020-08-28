@@ -35,10 +35,57 @@ function savePublication(req, res){
 
         return res.status(200).send({publication: publicationStored}); //Si no recibimos errores, guardamos el objeto de la publicación
     });
-
 }
+
+    // ---- LISTAR publicaciones ---- Recoge el Id del usuario identificado + find de todos los usuarios que sigo para devolverme todas sus publicaciones en Json
+
+    function getPublications(req, res){ //Pagination
+        let page = 1; //Recogemos el parámetro de la página por URL
+        if(req.params.page){ //Si existe le asignamos otro valor con los sig params
+            page = req.params.page;
+        }
+
+        let itemsPerPage = 5;
+
+        Follow.find({user: req.user.sub}).populate('followed').exec((err, follows) => { // Buscar todos los follows que hacemos como usuario identificado. 
+                                                                                        //con populated sustituimos el id de usuario por el objeto completo que hace referencia 
+          if(err) return res.status(500).send({message: 'Error al devolver el seguimiento'});
+
+          let follows_clean = []; //Array para los follows
+
+          follows.forEach((follow) => {  //Por cada interacción al array se crea un objeto follow
+            follows_clean.push(follow.followed); //push para añadir el id de usuario que estoy siguiendo. No añado el id si no un objeto completo
+
+          });
+          
+          Publication.find({user: {"$in": follows_clean}}).sort('-created_at').populate('user').paginate(page, itemsPerPage, (err, publications, total) => {
+            //Busca todos los objetos/publicaciones cuyo usuario esté dentro de la variable
+                                    //$in busca las coincidencias
+                                   //sort ordena las publicaciones de mayor a menor gracias al parámetro created_at
+                                   //populate lleva el objeto del usuario y nos devuelve los datos concretos
+            //ya tendría un listado paginado de las publicaciones de los usuarios que sigo                      
+
+            if(err) return res.status(500).send({message: 'Error al devolver las publicaciones'});
+
+            if(!publications)  return res.status(404).send({message: 'Publications Not Found'});
+
+            return res.status(200).send({
+                total_items: total, 
+                pages: Math.ceil(total/itemsPerPage), //Devuelve un total de todas las páginas
+                page: page, //Página actual
+                publications
+            })
+
+          }); 
+        });
+
+
+    }
+
+
 
 module.exports = {
     probando,
-    savePublication
+    savePublication,
+    getPublications
 }
