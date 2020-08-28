@@ -135,16 +135,28 @@ function savePublication(req, res){
                 //Si la imagen coincide con las extensiones que detallo abajo, se subirá
                 if(file_text == 'png' || file_ext == 'jpg' || file_ext == 'gif' || file_ext == 'jpeg'){
     
-                    Publication.findByIdAndUpdate(publicationId, {file: file_name}, {new:true}, (err, publicationUpdated) => { //Actualizar el documento de la publicación con la imagen
+
+                    Publication.findOne({'user':req.user.sub, '_id':publicationId}).exec((err, publication) => { //Solo puede borrar imágenes el usuario logeado como el mismo que las ha publicado
+                        if(publication){
+                            Publication.findByIdAndUpdate(publicationId, {file: file_name}, {new:true}, (err, publicationUpdated) => { //Actualizar el documento de la publicación con la imagen
     
-                        if(err) return res.status(500).send({message: 'No tienes permiso para modificar datos'});
-    
-                        if(!publicationUpdated) return res.status(404).send({message: 'Error not found. No se ha podido actualizar'});
-    
-                        return res.status(200).send({publication: publicationUpdated}); //si todo va bien, devolvemos el objeto modificado
-    
-    
+                                if(err) return res.status(500).send({message: 'No tienes permiso para modificar datos'});
+            
+                                if(!publicationUpdated) return res.status(404).send({message: 'Error not found. No se ha podido actualizar'});
+            
+                                return res.status(200).send({publication: publicationUpdated}); //si todo va bien, devolvemos el objeto modificado
+            
+            
+                            });
+                        }else{
+                            return removeFilesOfUploads(file_path, 'No tienes permiso'); //llamamos a la función auxiliar definida al final del fichero para eliminar la imagen en caso de no coincidir extensión
+
+                        }
+
                     });
+
+
+
     
                 }else{
                    return removeFilesOfUploads(file_path, 'Extensión no válida'); //llamamos a la función auxiliar definida al final del fichero para eliminar la imagen en caso de no coincidir extensión

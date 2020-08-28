@@ -6,6 +6,7 @@ let path = require('path'); //librería para trabajar con rutas del sistema de f
 
 let User = require('../models/user'); //cargamos el modelo de usuario. los controladores en mayúsculas
 let Follows = require('../models/follow');
+let Publication = require('../models/publication');
 let jwt = require('../services/token'); //cargamos el fichero del token
 
 function home(req, res){
@@ -269,9 +270,16 @@ function saveUser(req, res){
         return count;
     });
 
+    //variable para que me devuelva el total de publicaciones que hemos hecho
+    let publications = await Publication.count({"user":user_id}).exec((err, count) => {
+        if(err) return handleError(err);
+        return count;
+    });
+
     return {
         following: following,
-        followed: followed
+        followed: followed,
+        publications: publications
     }
 
  }
