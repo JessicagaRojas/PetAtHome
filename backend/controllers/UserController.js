@@ -327,7 +327,7 @@ function saveUser(req, res){
             //Si la imagen coincide con las extensiones que detallo abajo, se subirá
             if(file_text == 'png' || file_ext == 'jpg' || file_ext == 'gif' || file_ext == 'jpeg'){
 
-                User.findByIdAndUpdate(UserId, {image: file_name}, {new:true}, (err, userUpdated) => {
+                User.findByIdAndUpdate(UserId, {file: file_name}, {new:true}, (err, userUpdated) => {
 
                     if(err) return res.status(500).send({message: 'No tienes permiso para modificar datos'});
 
