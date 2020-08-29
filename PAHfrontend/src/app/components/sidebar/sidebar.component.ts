@@ -8,6 +8,7 @@ import { NgForm, FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { User } from '../../models/user';
 import { UserService } from '../../services/user.service';
 import { Publication } from '../../models/publication';
+import { PublicationService } from '../../services/publication.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -31,6 +32,7 @@ export class SidebarComponent implements OnInit {
     private _route: ActivatedRoute,
     private _router: Router,
     public userService: UserService,
+    public publicationService: PublicationService,
     private formBuilder: FormBuilder
 
   ) {
@@ -53,8 +55,26 @@ export class SidebarComponent implements OnInit {
     });
   }
 
-  onSubmit() {
-  
+  onSubmit(form) {
+    this.publicationService.addNewPublication(this.token, this.publication).subscribe(
+      response => { 
+        if(response.publication){ //Si la respuesta llega correctamente...
+         // this.publication = response.publication;
+          this.status = 'succes';
+          form.reset();
+        }else{
+          this.status = 'error';
+        }
+      },
+      error => {
+        let errorMessage = <any>error;
+        console.log(errorMessage);
+
+        if(errorMessage != null){
+          this.status = 'error';
+        }
+      }
+    );
   }
 
 
