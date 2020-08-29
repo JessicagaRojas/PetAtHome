@@ -73,6 +73,7 @@ function savePublication(req, res){
                 total_items: total, 
                 pages: Math.ceil(total/itemsPerPage), //Devuelve un total de todas las páginas
                 page: page, //Página actual
+                items_per_page: items_per_page,
                 publications
             })
 
