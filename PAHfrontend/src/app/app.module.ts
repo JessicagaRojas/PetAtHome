@@ -18,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { HomeComponent } from './components/home/home.component';
 import { UsersComponent } from './components/users/users.component';
 import { Error404Component } from './components/error404/error404.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { Error404Component } from './components/error404/error404.component';
     RegisterComponent,
     HomeComponent,
     UsersComponent,
-    Error404Component
+    Error404Component,
+    SidebarComponent
   ],
   imports: [
     MatIconModule,

@@ -13,11 +13,12 @@ export class UserService {
   public url: string; //URL de nuestro backend: "localhost:3800/api"
   public identity;
   public token;
+  public stats;
 
 
   constructor(private httpClient: HttpClient) {
     this.url = environment.url;
-
+  
   }
 
   //---- REGISTRO ----
@@ -84,6 +85,21 @@ export class UserService {
                                   .set('Authorization', this.getToken());
 
       return this.httpClient.get<User>(this.url + 'user/' + id, {headers: headers});
+  }
+
+  // ---Estadísticas de usuario ---
+
+  getStats(){
+    let stats = JSON.parse(localStorage.getItem('stats'));
+      if(stats != "undefined"){
+        this.stats = stats;
+
+      }else{
+        this.stats = null;
+      }
+      return this.stats;
+    
+    
   }
 
 
