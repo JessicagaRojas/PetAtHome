@@ -19,6 +19,7 @@ import { HomeComponent } from './components/home/home.component';
 import { UsersComponent } from './components/users/users.component';
 import { Error404Component } from './components/error404/error404.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { TimelineComponent } from './components/timeline/timeline.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
     HomeComponent,
     UsersComponent,
     Error404Component,
-    SidebarComponent
+    SidebarComponent,
+    TimelineComponent
   ],
   imports: [
     MatIconModule,
