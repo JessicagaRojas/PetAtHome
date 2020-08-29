@@ -1,0 +1,36 @@
+<div class="col-lg-8">
+    <h1 class="h1-strong">Timeline</h1>
+
+    <div id="publications">
+
+        <div *ngFor="let publication of publications" class="item-publication">
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <div class="image_user pull-left"> <!--Para recoger los avatares-->
+                        <a href="#">
+                            <img src="{{url + 'get-image-user/' + publication.user.image }}" *ngIf="publication.user.image" />
+                            <img class="avatar-default" src="../../../assets/IMG/user_default.png" *ngIf="!publication.user.image" /> <!--En el caso de que el usuario no tenga avatar-->
+
+                        </a>
+                    </div>
+
+                    <div class="username">{{publication.user.name + ' ' + publication.user.name}}</div>
+                
+
+                <h4>{{publication.text}}</h4>
+                
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-lg-12 text-center"><button class="btn btn-success" (click)="viewMore()" *ngIf="!noMore">+ Publicaciones</button></div>
+  
+
+</div>
+
+<sidebar></sidebar>
+
+<div class="clearfix"></div>

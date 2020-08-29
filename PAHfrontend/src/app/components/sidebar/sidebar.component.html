@@ -1,0 +1,79 @@
+<h1 class="misdatos-sidebar">Qué ha hecho tu mascota hoy? Súbelo, {{identity.name}}</h1>
+
+<div id="user-card" class="col-lg-4 panel panel-default pull-left">
+    <div class="avatar pull-left">
+
+        <img src="{{url + 'get-image-user/' + identity.image}}" *ngIf="identity.image"/>
+        <img src="../../../assets/IMG/user_default.png" *ngIf="!identity.image"/>
+        
+    </div>
+
+    <div class="name-surname pull-left">
+        <a href="#">{{identity.name +' '+ identity.surname}}</a>
+        <p class="nick">{{identity.nick}}</p>
+        <div class="clearfix"></div> <!--Para limpiar los flotados-->
+    </div>
+    <div class="clearfix"></div> <!--Para limpiar los flotados-->
+<!---->
+    <div class="stats" *ngIf="stats">
+        <div class="following-data">
+            <a href="#">
+                <span class="label-stats">Siguiendo</span>
+                <span class="number-stats">{{stats.following}}</span>
+            </a>
+        </div>
+    </div>
+<!---->
+    <div class="stats" *ngIf="stats">
+        <div class="following-data">
+            <a href="#">
+                <span class="label-stats">Seguidores</span>
+                <span class="number-stats">{{stats.followed}}</span>
+            </a>
+        </div>
+    </div>
+<!---->
+    <div class="stats" *ngIf="stats">
+        <div class="following-data">
+            <a href="#">
+                <span class="label-stats">Publicaciones</span>
+                <span class="number-stats">{{stats.publications}}</span>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<!--FORMULARIO PUBLICACIONES-->
+
+<div id="new-publication" class="col-lg-4 pull-left panel panel-default sidebar-32">
+    <h3>Crear Publicación</h3>
+
+    <div class="alert alert-success" *ngIf="status == 'success'">Publicación enviada!</div>
+
+    <div class="alert alert-danger" *ngIf="status == 'error'">Publicación NO enviada!</div>
+
+
+    <form class="col-lg-10" #newPublicationForm="ngForm" (ngSubmit)="onSubmit(newPublicationForm)">
+        <p>
+            <label>¿Cómo se ha portado tu mascota hoy?</label>
+            <textarea name="text" #text="ngModel" [(ngModel)]="publication.text" class="form-control" required></textarea>
+
+            <span *ngIf="!text.valid && text.touched">El texto es obligatorio</span>
+
+        </p>
+        <p>
+            <label>Sube fotos!</label>
+            <input type="file" placeholder="Subir imagen" />
+        </p>
+
+        <p>
+            <input type="submit" value="Enviar" class="btn btn-success" [disabled]="!new-publication.form.valid" />
+        </p>
+
+        
+
+    </form>
+
+
+</div>
