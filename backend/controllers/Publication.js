@@ -57,6 +57,8 @@ function savePublication(req, res){
             follows_clean.push(follow.followed); //push para añadir el id de usuario que estoy siguiendo. No añado el id si no un objeto completo
 
           });
+
+          follows_clean.push(req.user.sub); //Para mostrar también nuestras publicaciones propias
           
           Publication.find({user: {"$in": follows_clean}}).sort('-created_at').populate('user').paginate(page, itemsPerPage, (err, publications, total) => {
             //Busca todos los objetos/publicaciones cuyo usuario esté dentro de la variable
