@@ -41,7 +41,6 @@ export class TimelineComponent implements OnInit {
     this.identity = this.userService.getIdentity();
     this.token = this.userService.getToken();
     this.page = 1;
-    this.publication = this.publication;
 
    }
 
@@ -70,7 +69,7 @@ export class TimelineComponent implements OnInit {
 
             this.publications = arrayA.concat(arrayB); //Para que el contenido del array B se sume al A infinitamente
 
-            $("html, body").animate({ scrollTop: $('body').prop("scrollHeight")}, 500); //Animacióhn de Jquery
+           // $("html, body").animate({ scrollTop: $('body').prop("scrollHeight")}, 500); //Animacióhn de Jquery
           }
 
 

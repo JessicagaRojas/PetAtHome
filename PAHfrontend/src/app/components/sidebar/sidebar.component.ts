@@ -23,7 +23,7 @@ export class SidebarComponent implements OnInit {
   public publication: Publication;
   public status;
   public stats;
-  formUser: FormGroup;
+  form: FormGroup;
 
 
 
@@ -40,28 +40,26 @@ export class SidebarComponent implements OnInit {
     this.identity = this.userService.getIdentity(); //Método para sacar el usuario logeado
     this.token = this.userService.getToken(); //Inicializamos la propiedad con el token almacenado en esta variable
     this.stats = this.userService.getStats(); // GetStats saca los diferentes valores de los usuarios para utilizar contadores (las estadísticas)
-    this.publication = this.publication;
 
 
    }
 
   ngOnInit(): void {
 
-    this.formUser = this.formBuilder.group({
+    this.form = this.formBuilder.group({
       text: ['', Validators.required],
       file: ['', Validators.required],
-      created_at: ['', Validators.required],
-      user: ['', Validators.required]
+      user: ['', Validators.required] //to do -> Se tiene que pasar el usuario
     });
   }
 
-  onSubmit(form) {
-    this.publicationService.addNewPublication(this.token, this.publication).subscribe(
+  onSubmit() {
+    this.publicationService.addNewPublication(this.token, this.form.value).subscribe(
       response => { 
         if(response.publication){ //Si la respuesta llega correctamente...
          // this.publication = response.publication;
           this.status = 'succes';
-          form.reset();
+          this.form.reset();
         }else{
           this.status = 'error';
         }

@@ -19,7 +19,8 @@ function probando(req,res){
 
 function savePublication(req, res){ 
      let params = req.body; //Le pasamos las propiedades por body
-
+     console.log('REQQQQQ',req);
+     console.log('PARAMMSSSS',params);
     if(!params.text) return res.status(200).send({message: 'Debes enviar un texto'}); //En el caso de que no nos llegue un texto, 
 
     let publication = new Publication(); //parámetros a rellenar en cada objeto de publicación

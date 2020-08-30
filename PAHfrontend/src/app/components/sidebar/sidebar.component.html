@@ -54,12 +54,12 @@
     <div class="alert alert-danger" *ngIf="status == 'error'">Publicación NO enviada!</div>
 
 
-    <form class="col-lg-10" #newPublicationForm="ngForm" (ngSubmit)="onSubmit(newPublicationForm)">
+    <form class="col-lg-10" [formGroup]="form" (ngSubmit)="onSubmit()">
         <p>
             <label>¿Cómo se ha portado tu mascota hoy?</label>
-            <textarea name="text" #text="ngModel" [(ngModel)]="publication.text" class="form-control" required></textarea>
+            <textarea name="text" formControlName="text" class="form-control" required></textarea>
 
-            <span *ngIf="!text.valid && text.touched">El texto es obligatorio</span>
+            <span *ngIf="!form.controls.text.valid && form.controls.text.touched">El texto es obligatorio</span>
 
         </p>
         <p>
@@ -68,7 +68,7 @@
         </p>
 
         <p>
-            <input type="submit" value="Enviar" class="btn btn-success" [disabled]="!new-publication.form.valid" />
+            <input type="submit" value="Enviar" class="btn btn-success" [disabled]="!form.valid" />
         </p>
 
         
