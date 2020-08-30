@@ -1,39 +1,41 @@
-<mat-toolbar color="primary">
-  <span>Pet HOME</span>
-  <span class="example-spacer"></span>
+<router-outlet></router-outlet>
+  
+  <p>
+    <mat-toolbar color="primary">
+      <mat-toolbar-row>
+        <img src="../../../assets/IMG/logo_PAH2.png" alt="" class="logo-letras"/>
+        <span class="example-spacer"></span>
 
-  <button style="margin-left: 10px;" mat-icon-button class="example-icon favorite-icon"
-    aria-label="Example icon-button with heart icon">
-    <!--  <mat-icon>person</mat-icon> -->
-    Followers
-  </button>
-  <button style="margin-left: 10px;" mat-icon-button class="example-icon"
-    aria-label="Example icon-button with share icon">
-    <!--  <mat-icon>person_add</mat-icon> -->
-    Seguidos
-  </button>
-</mat-toolbar>
+      </mat-toolbar-row>
+  
+      <mat-toolbar-row>
+        <span class="example-spacer"></span>
+        <button mat-icon-button class [routerLink]="['/gente']" [routerLinkActive]="['active']"><img class="btn-gente" src="../../../assets/IMG/logo_gente.png"/></button>
+        <button mat-icon-button class [routerLink]="['/timeline']" [routerLinkActive]="['active']"><img class="btn-mensajes" src="../../../assets/IMG/icono_mensajes.png"/></button>
 
+       
+        <img src="../../../assets/IMG/lofo_PAH.png" alt="" class="logo-pah"/>
+        <li class="login-menu">
+            <a id="nick-login"  href="#">nick</a> <!--{{identity.name}}-->
+            <button mat-icon-button class [routerLink]="['']" [routerLinkActive]="['active']"><img class="btn-gente" src="../../../assets/IMG/user_black.png"/></button>
+
+            <a class="pointer"  href="#">Cerrar sesión</a> <!-- (click)="logout()" -->
+       </li>
+
+      </mat-toolbar-row>
+    </mat-toolbar>
+  </p>
+<!--
 <div>
-  <ul class="nav navbar-nav navbar-right" *ngIf="identity"> <!--Esta barra solo aparece si el usuario está identificado-->
-    <li class="avatar">
-      <!--cargar imagen de usuario-->
-      <a [routerLink]="['/home']" [routerLinkActive]="['active']" >Inicio</a> <!--añadir iconos-->
-      <a  [routerLink]="['/timeline']" [routerLinkActive]="['active']">Timeline</a> <!--añadir iconos-->
-      <a [routerLink]="['/gente']" [routerLinkActive]="['active']" >Gente</a> <!--añadir iconos-->
-
-
-
-    </li>
 
     <li class="dropdown">
-      <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+      <a class="dropdown-toggle"  href="#">
         {{identity.name}} <span class="caret"></span>
       </a>
 
       <ul class="dropdown-menu">
         <li>
-          <a [routerLink]="['']" [routerLinkActive]="['']" >Mi perfil</a> <!--añadir iconos-->
+          <a [routerLink]="['']" [routerLinkActive]="['']" >Mi perfil</a> 
           <a href="#">Mis datos</a>
           <a class="pointer" (click)="logout()" href="#">Cerrar sesión</a>
 
@@ -45,6 +47,5 @@
     </li>
   </ul>
 </div>
+-->
 
-
-<router-outlet></router-outlet>
