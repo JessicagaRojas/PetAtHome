@@ -24,6 +24,10 @@ export class TimelineComponent implements OnInit {
   public pages;
   public itemsPerPage;
   public total;
+  public title: string;
+  public showImage;
+
+
 
   public status: string;
   public publications: Publication[];
@@ -41,72 +45,87 @@ export class TimelineComponent implements OnInit {
     this.identity = this.userService.getIdentity();
     this.token = this.userService.getToken();
     this.page = 1;
+    this.title = 'Timeline';
+
 
    }
+   ngOnInit(){
+		console.log('timeline.component cargado correctamente!!');
+		this.getPublications(this.page);
+	}
 
-  ngOnInit(): void { this.getPublications(this.page); }
+	getPublications(page, adding = false){
+		this.publicationService.getPublications(this.token, page).subscribe(
+			response => {
+				if(response.publications){
+					this.total = response.total_items;
+					this.pages = response.pages;
+					this.itemsPerPage = response.items_per_page;
 
+					if(!adding){
+						this.publications = response.publications;
+					}else{
+						var arrayA = this.publications;
+						var arrayB = response.publications;
+						this.publications = arrayA.concat(arrayB);
 
-   // --- MOSTRAR listado publicaciones (scroll) ----
+					}
 
-  getPublications(page, adding = false){ //adding es para el "scroll"
-    this.publicationService.getPublications(this.token, page).subscribe(
-      response => {
-        if(response.publications){
-          this.total = response.total_items;
-          this.pages = response.pages;
-          this.itemsPerPage = response.items_per_page;
+					if(page > this.pages){
+						//this._router.navigate(['/home']);
+					}
+				}else{
+					this.status = 'error';
+				}
+			},
+			error => {
+				var errorMessage = <any>error;
+				console.log(errorMessage);
+				if(errorMessage != null){
+					this.status = 'error';
+				}
+			}
+		);
+	}
 
-          //Añadir/concatenar los nuevos elementos que devuelve la API. Añadir al array principal más publicaciones
+	public noMore = false;
+	viewMore(){
+		this.page += 1;
 
+		if(this.page == this.pages){
+			this.noMore = true;
+		}
 
-          if(!adding){ //Asignamos la respuesta del servicio por defecto a la propiedad this.publication
-            this.publications = response.publications; //Dentro de esta propiedad está el array de publicaciones
+		this.getPublications(this.page, true);
+	}
 
-          }else{ //En el caso de devolver true (cuando el UX le de al botón más)
-            let arrayA = this.publications; //Aquí la primera page obtenida
-            let arrayB = response.publications; //Aquí la nueva que se obtiene
+	refresh(event = null){
+		this.getPublications(1);
+	}
 
-            this.publications = arrayA.concat(arrayB); //Para que el contenido del array B se sume al A infinitamente
+	showThisImage(id){
+		this.showImage = id;
+	}
 
-           // $("html, body").animate({ scrollTop: $('body').prop("scrollHeight")}, 500); //Animacióhn de Jquery
-          }
+	hideThisImage(id){
+		this.showImage = 0;
+	}
 
-
-          if(page > this.pages){ //Si la págiuna actual es mayor a la que tengo guardada...
-            //this._router.navigate(['/home']);  //...redirigimos a Home
-          }
-
-          }else{
-            this.status = 'error';
-         }
-      },
-      error => {
-        let errorMessage = <any>error;
-        console.log(errorMessage);
-
-        if(errorMessage != null){
-          this.status = 'error';
-        }
-      }
-    );
-  }
-
-  // ---- Lógica para el botón VER MÁS ----
-
-  public noMore = false; //Condición para cuando no haya más publicaciones que mostrar. Por default en false
-  viewmore(){
-    if(this.publications.length == this.total){ //Si no hay más publicaciones, no se podrá cargar este botón
-      this.noMore = true;
-
-    }else{ //Si lo de arriba no se cumple y SÍ que tenemos más elementos por mostrar...
-      this.page += 1;
-    }
-
-    this.getPublications(this.page, true);
-
-  }
-
-  onSubmit() {}
-
+	deletePublication(id){
+		this.publicationService.deletePublication(this.token, id).subscribe(
+			response => {
+				this.refresh();
+			},
+			error => {
+				console.log(<any>error);
+			}
+		);
+	}
 }
+  
+
+
+
+
+
+   
