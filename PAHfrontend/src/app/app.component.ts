@@ -36,7 +36,7 @@ export class AppComponent implements OnInit, DoCheck{
   logout(){
     localStorage.clear(); //Borramos los parámetros almacenador el LS
     this.identity = null;
-    this._router.navigate(['/']);
+    this._router.navigate(['/timeline']);
   }
 
 }
