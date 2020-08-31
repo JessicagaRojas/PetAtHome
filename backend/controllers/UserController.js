@@ -89,6 +89,7 @@ function saveUser(req, res){
      let email = params.email;
      let password = params.password;
 
+     console.log('login',params);
      User.findOne({email: email},(err, user) => { //método para buscar una coincidencia en usuarios + emails
           if(err) return res.status(500).send({message: 'Error'});
 

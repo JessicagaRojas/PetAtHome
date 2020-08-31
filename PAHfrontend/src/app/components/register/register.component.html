@@ -1,3 +1,5 @@
+
+
 <div>
     <!-- onsubmit es un método de Angular para pasarle acciones -->
     <div class="contenedor-logo-registro">
@@ -56,23 +58,9 @@
                 <span *ngIf="!formUser.controls.password.valid && formUser.controls.password.touched">La contraseña es obligatoria!</span>
             </div>
 
-            <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!formUser.valid">Enviar formulario</button>
+            <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!formUser.valid" [routerLink]="['/login']">Enviar formulario</button>
+
 
         </form>
     </mat-card>
 </div>
-<!--
-    <div class="alert alert-danger" *ngIf="errorMsg">{{errorMsg}}</div>
-    <div class="form-registro">
-        <input type="text" class="registro-nombre" name="name" ngModel placeholder="Introduce tu nombre" aria-describedby="emailHelp">
-    </div>
-    <div class="form-registro">
-        <input type="email" email required class="registro-email" name="email" ngModel placeholder="Introduce tu email" required email aria-describedby="emailHelp">
-        <div class="alert alert-danger" *ngIf="registerForm.submitted && registerForm.form.controls.email?.errors?.email"> El email no es válido</div>
-    </div>
-    <div class="form-registro">
-        <input type="password" name="password" ngModel class="registro-password" required placeholder="Introduce tu contraseña">
-    </div>
-    <button type="submit" class="boton-submit-registro" routerLink="/filmslist" routerLinkActive="active-link">Submit</button>
-</form>
-{{registerForm.value | json}} -->

@@ -40,24 +40,27 @@ export class LoginComponent implements OnInit {
     console.log('Componente cargando...');
 
     this.formLogin = this.formBuilder.group({
-      nick: ['', Validators.required],
-      role: ['ROLE_USER'],
-      email: ['', Validators.required],
-      password: ['', Validators.required]
+      email: ['dieguen@gmail.com', Validators.required],
+      password: ['1234', Validators.required],
+      gettoken: [true, Validators.required]
     });
   }
 
-
   onSubmit() {
-    alert("¡Dentro! :D ");
     // Llamar al backend
-    this.userService.signup(this.formLogin.value).subscribe((data) => {
-      console.log(data);
-      this.identity = data.user;
-
-    });
-
-
+    this.userService.signup(this.formLogin.value).subscribe( data => {
+        console.log(data);
+        this.identity = data.user;
+        alert("¡Dentro! :D ");
+        sessionStorage.setItem('token', data.token)
+        this._router.navigateByUrl('/');
+      },
+      error => {
+        alert( error.message);
+      },() => {
+        // No errors, route to new page
+      }
+    );
 
       if(!this.identity || !this.identity._id){
         this.status = 'error';

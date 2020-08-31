@@ -9,6 +9,7 @@ import { HomeComponent } from './components/home/home.component';
 import { UsersComponent } from './components/users/users.component';
 import { Error404Component } from './components/error404/error404.component';
 import { TimelineComponent } from './components/timeline/timeline.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -20,6 +21,8 @@ const routes: Routes = [
   { path: 'gente', component: UsersComponent }, //La misma ruta de gente pero sin parámetro
   { path: 'gente:page', component: UsersComponent },
   {path: 'timeline', component: TimelineComponent },
+  {path: 'footer', component: FooterComponent },
+
   { path: '**', component: Error404Component },
 
 
