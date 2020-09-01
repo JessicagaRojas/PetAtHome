@@ -1,24 +1,63 @@
-#publications {
-    min-height: 500px;
-    
+
+#container-publications{
+    background-color: #e0ece4 !important;
 }
 
-.item-user .image-user,
-.item-publication .image-user{
-    width: 75px;
-    height: 75px;
-    border-radius: 100px;
-    overflow: hidden;
-    margin-right: 15px;
+.container-time{
+    background-color: #f1f3f8;
+    height: 20em;
+    margin-top: -3.5em;
+}
+
+#texto-timeline{
+    display: flex;
+    position: absolute;
+    font-family: 'hobostd', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 25px;
+    margin-left: 6em;
+    margin-top: 2em;
+}
+
+#pata-imagen{
+    display: flex;
+    position: absolute;
+    margin-left: 12em;
+    margin-top: 5em;
+}
+
+#logo-imagen{
+    display: flex;
+    position: absolute;
+    margin-left: 46em;
+    margin-top: 8em;
+}
+
+#publications{
+	min-height: 500px;
+}
+
+#publications .date{
+	color: gray;
+}
+
+#btn-refresh{
+    display: flex;
+    position: absolute;
+    background-color: #faf3dd !important;
+    padding: 1em;
+    color: black;
+    border-color: burlywood;
+    border-radius: 20%;
+    margin-top: 11em;
+    margin-left: 37em;
 
 }
 
-.item-user .image-user img,
-.item-publication .image-user{
-    width: 120px;
-}
+/* PUBLICACIONES */
 
-.item-user .user-name,
-.item-publication .username {
-    margin-top: 10px;
+#btn-trigger{
+    background-color: #8d93ab !important;
+    border-color: #776d8a;
+
+
 }

@@ -1,8 +1,16 @@
-.contenedor-form-registro{
-    display: flex;
+#container-register{
     background-color: #e0ece4;
     height: 50em;
-    margin-top: -2.7em !important;
+    margin-top: -1.5em !important;
+}
+
+#container-register-form{
+    width: 25em;
+    margin-left: 40em;
+}
+
+#label-nombre-register{
+    margin-top: 5em;
 }
 
 .example-form-field{
@@ -14,18 +22,20 @@
 
 #btn-sub-reg{
     margin-top: 1.8em;
-    margin-left: 51.7em;
+    margin-left: 8em;
 }
 
 #registrate-imagen{
     display: flex;
-    margin-top: -27em;
+    position: absolute;
+    margin-top: 7em;
 }
 
 #texto-registro{
     display: flex;
     position: absolute;
     margin-left: 2em;
-    margin-top: -19em;
+    margin-top: 3em;
     font-family: 'hobostd', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
 }

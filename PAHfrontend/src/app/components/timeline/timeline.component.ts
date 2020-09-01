@@ -1,61 +1,50 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { HttpClientModule, HttpHeaders, HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-
-import { UserService } from '../../services/user.service';
-import { User } from '../../models/user';
 import { Publication } from '../../models/publication';
+import { GLOBAL } from '../../services/global';
+import { UserService } from '../../services/user.service';
 import { PublicationService } from '../../services/publication.service';
 
-
- 
 @Component({
-  selector: 'app-timeline',
-  templateUrl: './timeline.component.html',
-  styleUrls: ['./timeline.component.css']
+	selector: 'timeline',
+	templateUrl: './timeline.component.html',
+	styleUrls: ['./timeline.component.css'],
+
+	providers: [UserService, PublicationService]
 })
-export class TimelineComponent implements OnInit {
-  public url: string;
-  public identity;
-  public token;
-  public users: User[];
-  public page;
-  public pages;
-  public itemsPerPage;
-  public total;
-  public title: string;
-  public showImage;
+export class TimelineComponent implements OnInit{
+	public title: string;
+	public identity;
+	public token;
+	public url: string;
+	public status: string;
+	public page;
+	public total;
+	public pages;
+	public itemsPerPage;
+	public publications: Publication[];
+	public showImage;
 
+	constructor(
+		private _route: ActivatedRoute,
+		private _router: Router,
+		private _userService: UserService,
+		private _publicationService: PublicationService
+	){
+		this.title = 'Timeline';
+		this.identity = this._userService.getIdentity();
+		this.token = this._userService.getToken();
+		this.url = GLOBAL.url;
+		this.page = 1;
+	}
 
-
-  public status: string;
-  public publications: Publication[];
-
-  constructor(    private httpClient: HttpClient,
-    private _route: ActivatedRoute,
-    private _router: Router,
-    private userService: UserService,
-    private publicationService: PublicationService
-    
-
-
-  ) { 
-    this.url = environment.url;
-    this.identity = this.userService.getIdentity();
-    this.token = this.userService.getToken();
-    this.page = 1;
-    this.title = 'Timeline';
-
-
-   }
-   ngOnInit(){
+	ngOnInit(){
 		console.log('timeline.component cargado correctamente!!');
 		this.getPublications(this.page);
 	}
 
 	getPublications(page, adding = false){
-		this.publicationService.getPublications(this.token, page).subscribe(
+		this._publicationService.getPublications(this.token, page).subscribe(
 			response => {
 				if(response.publications){
 					this.total = response.total_items;
@@ -69,6 +58,7 @@ export class TimelineComponent implements OnInit {
 						var arrayB = response.publications;
 						this.publications = arrayA.concat(arrayB);
 
+						$("html, body").animate({ scrollTop: $('body').prop("scrollHeight")}, 500);
 					}
 
 					if(page > this.pages){
@@ -112,7 +102,7 @@ export class TimelineComponent implements OnInit {
 	}
 
 	deletePublication(id){
-		this.publicationService.deletePublication(this.token, id).subscribe(
+		this._publicationService.deletePublication(this.token, id).subscribe(
 			response => {
 				this.refresh();
 			},
@@ -122,10 +112,3 @@ export class TimelineComponent implements OnInit {
 		);
 	}
 }
-  
-
-
-
-
-
-   

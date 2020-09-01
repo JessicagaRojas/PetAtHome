@@ -1,179 +1,151 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { HttpClientModule, HttpHeaders, HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-
-
-
-import { UserService } from '../../services/user.service';
 import { User } from '../../models/user';
 import { Follow } from '../../models/follow';
+import { UserService } from '../../services/user.service';
 import { FollowService } from '../../services/follow.service';
+import { GLOBAL } from '../../services/global';
 
 @Component({
-  selector: 'app-users',
-  templateUrl: './users.component.html',
-  styleUrls: ['./users.component.css']
+	selector: 'users',
+	templateUrl: './users.component.html',
+	styleUrls: ['./users.component.css'],
+
+	providers: [UserService, FollowService]
 })
+export class UsersComponent implements OnInit{
+	public title: string;
+	public url: string;
+	public identity;
+	public token;
+	public page;
+	public next_page;
+	public prev_page;
+	public total;
+	public pages;
+	public users: User[];
+	public follows;
+	public status: string;
 
+	constructor(
+		private _route: ActivatedRoute,
+		private _router: Router,
+		private _userService: UserService,
+		private _followService: FollowService
+	){
+		this.title = 'Gente';
+		this.url = GLOBAL.url;
+		this.identity = this._userService.getIdentity();
+		this.token = this._userService.getToken();
+	}
 
-export class UsersComponent implements OnInit { //propiedades
-  public url: string;
-  public title: string;
-  public identity;
-  public token;
-  public page;
-  public next_page;
-  public prev_page;
-  public total;
-  public pages;
-  public users: User[];
-  public follows; //Aquí guardamos los usuarios que estamos siguiendo
-  public status: string;
+	ngOnInit(){
+		console.log("users.component ha sido cargado");
+		this.actualPage();
+	}	
 
+	actualPage(){
+		this._route.params.subscribe(params => {
+			let page = +params['page'];
+			this.page = page;
 
-  constructor(
-    private httpClient: HttpClient,
-    private _route: ActivatedRoute,
-    private _router: Router,
-    private userService: UserService,
-    private followService: FollowService
+			if(!params['page']){
+				page = 1;
+			}
 
+			if(!page){
+				page = 1;
+			}else{
+				this.next_page = page+1;
+				this.prev_page = page-1;
 
-  ) { 
-    this.title = 'Gente',
-    this.url = environment.url;
-    this.identity = this.userService.getIdentity();
-    this.token = this.userService.getToken();
+				if(this.prev_page <= 0){
+					this.prev_page = 1;
+				}
+			}
 
-   }
+			// devolver listado de usuarios
+			this.getUsers(page);
+		});
+	}
 
+	getUsers(page){
+		this._userService.getUsers(page).subscribe(
+			response => {
+				if(!response.users){
+					this.status = 'error';
+				}else{
+					this.total = response.total;
+					this.users = response.users;
+					this.pages = response.pages;
+					this.follows = response.users_following;
 
+					if(page > this.pages){
+						this._router.navigate(['/gente',1]);
+					}
+				}
+			},
+			error => {
+				var errorMessage = <any>error;
+				console.log(errorMessage);
 
-  ngOnInit(): void {
-    console.log('users.component ha sido cargado');
-    this.actualPage();
-  }
+				if(errorMessage != null){
+					this.status = 'error';
+				}
+			}
+		);
+	}
 
-  // ----  ----
+	public followUserOver;
+	mouseEnter(user_id){
+		this.followUserOver = user_id;
+	}
 
-  actualPage(){
-    this._route.params.subscribe(params => { //Capturamos parámetros de la URL con el método subscribe
-      let page = + params['page']; //Recogemos el parámetro en la variable page, convirtiéndolo en entero con el símbolo +
-      this.page = page; //Devuelve la página a la vista
+	mouseLeave(user_id){
+		this.followUserOver = 0;
+	}
 
-      if(!params['page']){ //Si no hay parámetros muestra 1
-        page = 1;
-      }
+	followUser(followed){
+		var follow = new Follow('',this.identity._id, followed);
 
+		this._followService.addFollow(this.token, follow).subscribe(
+			response => {
+				if(!response.follow){
+					this.status = 'error';
+				}else{
+					this.status = 'success';
+					this.follows.push(followed);
+				}
+			},
+			error => {
+				var errorMessage = <any>error;
+				console.log(errorMessage);
 
-      if(!page){ //si no existen páginas, mostrará solo 1
-        page = 1;
+				if(errorMessage != null){
+					this.status = 'error';
+				}
+			}
+		);
+	}
 
-      }else{ //Si devuelve páginas (en plural), las ordenamos
-        this.next_page = page+1;
-        this.prev_page = page-1;
+	unfollowUser(followed){
+		this._followService.deleteFollow(this.token, followed).subscribe(
+			response =>{
+				var search = this.follows.indexOf(followed);
+				if(search != -1){
+					this.follows.splice(search, 1);
+				}
+			},
+			error => {
+				var errorMessage = <any>error;
+				console.log(errorMessage);
 
-        if(this.prev_page <= 0){ // Para que el mínimo de pags que muestre sea siempre 1
-          this.prev_page = 1;
-        }
-      }
-
-      this.getUsers(page);
-
-    });
-  }
-
-// ---- Sacar listado de usuarios ----
-
-  getUsers(page){ //Este método recibe como parámetro la página que le toque cargar
-    this.userService.getUsers(page).subscribe(
-      response => { 
-        if(!response.users){ //Si response no existiera le damos un valor status de error 
-          this.status = 'error';
-
-        }else{
-          this.total = response.total; //Estos elementos están dentro del array User
-          this.users = response.users;
-          this.pages = response.pages;
-          this.follows = response.users_following;
-
-          console.log(this.follows); //aquí dentro ya está el array con los usuarios que sigo
-
-          if(page > this.pages){ //Si metemos una página que no existe (como usuarios) nos lleva a la pag1 
-            this._router.navigate(['/gente',1]);
-          }
-        }
-        
-      },
-      error => {
-        let errorMessage = <any>error; //Guardamos en esta variable el error y lo mostramos por consola
-        console.log(errorMessage);
-
-        if(errorMessage != null){
-          this.status = 'error';
-        }
-      }
-    );
-
-  }
-
-
-    //
-
-    followUser(followed){
-      let follow: Follow;
-      follow.user = null;
-      follow.followed = followed;
-
-      this.followService.addFollow(this.token, follow).subscribe(
-          response => {
-            if (!response.follow){
-              this.status = 'error';
-
-            }else{
-              this.status = 'success';
-              this.follows.push(followed); //añadimos nuevo id al array + followed (id de usuario que acabamos de seguir)
-            }
-
-          },
-          error => {
-            let errorMessage = <any>error; //Guardamos en esta variable el error y lo mostramos por consola
-        console.log(errorMessage);
-
-        if(errorMessage != null){
-          this.status = 'error';
-        }
-
-        }
-      );
-    }
-
-    // ---- Dejar de seguir ----
-
-    unfollowUser(followed){
-      this.followService.deleteFollow(this.token, followed).subscribe(
-        response => {
-
-          let search = this.follows.indexOf(followed); //Busca followed en el array de follows
-            if(search != -1){ //Si la búsqueda es diferente a -1...
-              this.follows.splice(search, 1);  //...elimina el elemento
-
-            }
-
-
-        },
-        error => {
-          let errorMessage = <any>error; //Guardamos en esta variable el error y lo mostramos por consola
-          console.log(errorMessage);
-  
-          if(errorMessage != null){
-            this.status = 'error';
-          }
-        }
-      );
-    }
-
-
+				if(errorMessage != null){
+					this.status = 'error';
+				}
+			}
+		);
+	}
 
 }
+

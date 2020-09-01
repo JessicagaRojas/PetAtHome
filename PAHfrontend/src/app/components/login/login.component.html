@@ -1,38 +1,37 @@
-<router-outlet></router-outlet>
+<div class="col-lg-5" id="container-login">
 
 
-<mat-card >
-    <div class="container-login">
-    <form [formGroup]="formLogin" >
+	<div class="alert alert-success" *ngIf="status == 'success'">
+		Te has identificado correctamente, bienvenido!!
+	</div>
 
-        <div class="login-form">
+	<div class="alert alert-danger" *ngIf="status == 'error'">
+		No te has podido identificar correctamente!!
+	</div>
 
-        <mat-form-field class="example-form-field">
-            <mat-label>Email</mat-label>
-            <input matInput type="text" formControlName="email" required
-                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
-        </mat-form-field>
+	<form #loginForm="ngForm" (ngSubmit)="onSubmit()" class="col-lg-12" id="container-login-form">
+		<p>
+			<label class="labels-login" id="label-email-login">Correo electrónico</label>
+			<input id="input-email-login" type="email" name="email" #email="ngModel" [(ngModel)]="user.email" class="form-control" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" />
+			<span *ngIf="!email.valid && email.touched">
+				El email no es correcto
+			</span>
+		</p>
+		
+		<p>
+			<label id="label-contra-login" >Contraseña</label>
+			<input id="input-contra-login" type="password" name="password" #password="ngModel" [(ngModel)]="user.password" class="form-control" required />
+			<span *ngIf="!password.valid && password.touched">
+				 La contraseña es obligatoria
+			</span>
+		</p>
 
-        <span *ngIf="!formLogin.controls.email.valid && formLogin.controls.email.touched" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">El email no es válido!</span>
-    </div>
+		<input id="btn-sub-log" type="submit" value="Entrar" class="btn btn-success" [disabled]="!loginForm.form.valid" />
+	</form>
 
+	<h1 id="texto-login" >Cuidadores cerca de tí. Sin jaulas</h1>
 
+	<img id="logeate-imagen" src="../../../assets/IMG/logeate.png" alt="" width="450px" height="400px">
 
-    <div>
-        <mat-form-field class="example-form-field" id="password-field">
-            <mat-label>Password</mat-label>
-            <input matInput type="text" formControlName="password" required>
-        </mat-form-field>
-        <span *ngIf="!formLogin.controls.password.valid && formLogin.controls.password.touched">La contraseña es obligatoria!</span>
-    </div>
-
-        <button mat-raised-button color="primary" id="btn-sub-log" (click)="onSubmit()" [disabled]="!formLogin.valid" [routerLink]="['/timeline']">Enviar</button>
-
-    </form>
-
-    <h1 id="texto-login" >Cuidadores cerca de tí. Sin jaulas</h1>
-
-    <img id="logeate-imagen" src="../../../assets/IMG/logeate.png" alt="" width="450px" height="400px">
 
 </div>
-</mat-card>

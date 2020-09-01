@@ -1,61 +1,46 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClientModule, HttpHeaders, HttpClient } from '@angular/common/http';
+import {Component, OnInit, EventEmitter, Input, Output } from "@angular/core";
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { environment } from '../../../environments/environment';
-import { NgForm, FormGroup, Validators, FormBuilder } from '@angular/forms';
-
-
-import { User } from '../../models/user';
-import { UserService } from '../../services/user.service';
-import { Publication } from '../../models/publication';
-import { PublicationService } from '../../services/publication.service';
+import {UserService} from '../../services/user.service';
+import {GLOBAL} from '../../services/global';
+import {Publication} from '../../models/publication';
+import {PublicationService} from '../../services/publication.service';
+import {UploadService} from '../../services/upload.service';
 
 @Component({
-  selector: 'app-sidebar',
-  templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.css']
+	selector: 'sidebar',
+	templateUrl: './sidebar.component.html',
+	styleUrls: ['./sidebar.component.css'],
+
+	providers: [UserService, PublicationService, UploadService]
 })
-export class SidebarComponent implements OnInit {
-  public url: string;
-  public identity;
-  public user: User; //Creamos el objeto de User para rellenar y modificarlo
-  public token;
-  public publication: Publication;
-  public status;
-  public stats;
-  form: FormGroup;
+export class SidebarComponent implements OnInit{
+	public identity;
+	public token;
+	public stats;
+	public url;
+	public status;
+	public publication: Publication;
 
+	constructor(
+		private _userService: UserService,
+		private _publicationService: PublicationService,
+		private _uploadService: UploadService,
+		private _route: ActivatedRoute,
+		private _router: Router
+	){
+		this.identity = this._userService.getIdentity();
+		this.token = this._userService.getToken();
+		this.stats = this._userService.getStats();
+		this.url = GLOBAL.url;
+		this.publication = new Publication("","","","",this.identity._id);
+	}
 
+	ngOnInit(){
+		console.log("sidebar.component ha sido cargado!!");
+	}
 
-  constructor(
-    private httpClient: HttpClient,
-    private _route: ActivatedRoute,
-    private _router: Router,
-    public userService: UserService,
-    public publicationService: PublicationService,
-   // public _uploadService: UploadService,
-    private formBuilder: FormBuilder
-
-  ) {
-    this.url = environment.url;
-    this.identity = this.userService.getIdentity(); //Método para sacar el usuario logeado
-    this.token = this.userService.getToken(); //Inicializamos la propiedad con el token almacenado en esta variable
-    this.stats = this.userService.getStats(); // GetStats saca los diferentes valores de los usuarios para utilizar contadores (las estadísticas)
-
-
-   }
-
-  ngOnInit(): void {
-
-    this.form = this.formBuilder.group({
-      text: ['', Validators.required],
-      file: ['', Validators.required],
-      user: ['', Validators.required] //to do -> Se tiene que pasar el usuario
-    });
-  }
-/*
-  onSubmit(form, $event){
-		this.publicationService.addNewPublication(this.token, this.publication).subscribe(
+	onSubmit(form, $event){
+		this._publicationService.addPublication(this.token, this.publication).subscribe(
 			response => {
 				if(response.publication){
 					//this.publication = response.publication;
@@ -96,13 +81,10 @@ export class SidebarComponent implements OnInit {
 		this.filesToUpload = <Array<File>>fileInput.target.files;
 	}
 
-  // Output 
-  /*
+	// Output
 	@Output() sended = new EventEmitter();
 	sendPublication(event){
 		this.sended.emit({send:'true'});
-	}*/
+	}
 
 }
-
-

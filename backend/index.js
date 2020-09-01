@@ -1,18 +1,18 @@
 'use strict'
 
-let mongoose = require('mongoose');
-let app = require('./app'); //cargar el fichero app.js
-let port = 3800;
+var mongoose = require('mongoose');
+var app = require('./app');
+var port = 3800;
 
-mongoose.Promise = global.Promise; //conexión con la bbdd
-mongoose.connect('mongodb://localhost:27017/petathome', {useMongoClient: true})
-    .then(() => {
-        console.log("Conexión con la bbdd realizada :D");
-
-        //llamamos al método listen de express para que escuche las peticiones http
-        app.listen(port, () => {
-            console.log("servidor arrancado en el puerto 3800 :D");
-        })
-
-    })
-    .catch(err => console.log(err));
+// Conexión Database
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost:27017/curso_mean_social', { useMongoClient: true})
+		.then(() => {
+			console.log("La conexión a la base de datos curso_mean_social se ha realizado correctamente!!");
+		
+			// Crear servidor
+			app.listen(port, () => {
+				console.log("Servidor corriendo en http://localhost:3800");
+			});
+		})
+		.catch(err => console.log(err));

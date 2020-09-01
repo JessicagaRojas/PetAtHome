@@ -1,55 +1,66 @@
-<div>
-    <h1 class="h1-strong">{{title}}</h1>
+<div class="col-lg-8">
+	<h1 class="h1-strong">{{title}}</h1>
 
-    <div class="gente">
-        <!--LISTADO-->
-        <div class="item-usuario" *ngFor="let user of users"> <!--Esto crea un div por cada usuario que tenga en mi array-->
-            <div class="panel panel-default">
+	<div class="people">
 
-                <div class="panel-body">
+		<!--LISTADO-->
+		<div *ngFor="let user of users" class="item-user">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="image-user pull-left">
+						<a href="#">
+							<img src="{{ url +'get-image-user/' + user.image }}" *ngIf="user.image"/>
+							<img src="assets/user.png" class="avatar-default" *ngIf="!user.image"/>
+						</a>	
+					</div>
 
-                    <div class="image_user pull-left"> <!--Para recoger los avatares-->
-                        <a href="#">
-                            <img src="{{url + 'get-image-user/' + user.image }}" *ngIf="user.image" />
-                            <img class="avatar-default" src="../../../assets/IMG/user_default.png" *ngIf="!user.image" /> <!--En el caso de que el usuario no tenga avatar-->
+					<div class="user-name pull-left">
+						<p class="name-surname">
+							<a [routerLink]="['/perfil',user._id]">
+								{{user.name + ' ' + user.surname}}
+							</a>
+						</p>
+						<p class="nickname">{{user.nick}}</p>
+					</div>
 
-                        </a>
-                    </div>
-                <div class="user_name pull-left"> <!--panel de bootstrap-->
-                    <a href="#">
-                    {{user.name + ' ' + user.surname}} | {{user.nick}}
-                    </a>
-                </div>
-                </div>
-                <!--Añadir botones follow-->
+					<!-- SEGUIR/DEJAR DE SEGUIR -->
+					<div class="pull-right" *ngIf="user._id != identity._id">
+						<button class="btn btn-success" *ngIf="follows.indexOf(user._id) < 0"
+						(click)="followUser(user._id)">
+							<span class="glyphicon glyphicon-plus-sign"></span>
+							Seguir
+						</button>
 
-                <div class="pull-right" *ngIf="user._id != identity._id" > <!-- Añadimos condición para que no aparezca opción de seguirnos a nosotros mismos-->
-                    <button class="btn btn-success" *ngIf="follows.indexOf(user._id) < 0" (click)="followUser(user._id)" >Seguir</button>
-                    <button class="btn btn-default">Siguiendo</button>
+						<button class="btn btn-primary" 
+						*ngIf="follows.indexOf(user._id) >= 0"
+						(mouseenter)="mouseEnter(user._id)"
+						(mouseleave)="mouseLeave(user._id)"
+						(click)="unfollowUser(user._id)"
+						[class.btn-danger]="user._id == followUserOver"
+						>
+							<span *ngIf="user._id == followUserOver; else following">
+								<span class="glyphicon glyphicon-minus-sign"></span>
+								Dejar de seguir
+							</span>
+							<ng-template #following>
+								<span class="glyphicon glyphicon-ok-sign"></span>
+								Siguiendo
+							</ng-template>
 
-                    <button class="btn btn-primary" *ngIf="follows.indexOf(user._id) >= 0" (click)="unfollowUser(user.id)" >Dejar de seguir</button>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 
-               </div>
-
-
-            </div>
-
-        </div>
-
-<!--PAGINATOR-->
-
-        <ul class="pagination pull-right">
-            <li *ngIf="page > 1"><a [routerLink]="['gente', prev_page]">Anterior</a></li>
-            <li *ngIf="pages != page"><a [routerLink]="['gente', next_page]">Siguiente</a></li>
-
-        </ul>
-
-    </div>
-
-    
+		<!--PAGINACION-->
+		<ul class="pagination pull-right">
+			<li *ngIf="page > 1"><a [routerLink]="['/gente', prev_page]">Anterior</a></li>
+			<li *ngIf="pages != page"><a [routerLink]="['/gente', next_page]">Siguiente</a></li>
+		</ul>
+	</div>
 </div>
 
-<app-sidebar></app-sidebar>
-
+<sidebar></sidebar>
 
 <div class="clearfix"></div>

@@ -1,63 +1,55 @@
-import { UserService } from './../../services/user.service';
-import { environment } from '../../../environments/environment';
-import { Injectable } from '@angular/core';
-import { HttpClientModule, HttpHeaders, HttpClient } from '@angular/common/http';
-
-
-
-
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { User } from '../../models/user';
-import { NgForm, FormGroup, Validators, FormBuilder } from '@angular/forms';
-
+import { UserService } from '../../services/user.service';
 
 @Component({
-  selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
-})
+	selector: 'register',
+	templateUrl: './register.component.html',
+	styleUrls: ['./register.component.css'],
 
+	providers: [UserService]
+}) 
+export class RegisterComponent implements OnInit{
+	public title:string;
+	public user: User;
+	public status: string;
 
-export class RegisterComponent implements OnInit {
-  public url: string;
-  public user: User; //Creamos el objeto de User para rellenar y modificarlo
-  public title: string;
+	constructor(
+		private _route: ActivatedRoute,
+		private _router: Router,
+		private _userService: UserService
+	){
+		this.title = 'Registrate';
+		this.user = new User("",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"ROLE_USER",
+		"");
+	}
 
-  formUser: FormGroup;
+	ngOnInit(){
+		console.log('Componente de register cargado...');
+	}
 
-  constructor(
-    private httpClient: HttpClient,
-    private _route: ActivatedRoute,
-    private _router: Router,
-    public userService: UserService,
-    private formBuilder: FormBuilder
-  ) {
-    this.title = 'Regístrate!';
-    this.url = environment.url;
+	onSubmit(form){
+		this._userService.register(this.user).subscribe(
+			response => {
+				if(response.user && response.user._id){
+					//console.log(response.user);
 
-  }
-
-  ngOnInit(): void {
-    console.log('Componente cargando...');
-
-    this.formUser = this.formBuilder.group({
-      name: ['', Validators.required],
-      surname: ['', Validators.required],
-      nick: ['', Validators.required],
-      role: ['ROLE_USER'],
-      email: ['', Validators.required],
-      password: ['', Validators.required]
-    });
-
-  }
-
-  onSubmit() {
-    alert("¡Gracias por registrarte!");
-    // Llamar al backedn
-    this.userService.register(this.formUser.value).subscribe((data) => {
-      console.log(data);
-    });
-  }
-
+					this.status = 'success';
+					form.reset();
+				}else{
+					this.status = 'error';
+				}
+			},
+			error => {
+				console.log(<any>error);
+			}
+		);
+	}
 }

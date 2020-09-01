@@ -1,52 +1,43 @@
-import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
-import { HttpClientModule, HttpHeaders, HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs'; //Para que funcione suscribe
-
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs/Observable';
+import { GLOBAL } from './global';
 import { Publication } from '../models/publication';
 
+@Injectable()
+export class PublicationService{
+	public url: string;
 
-@Injectable({
-  providedIn: 'root'
-})
-export class PublicationService {
-  public url: string; //URL de nuestro backend: "localhost:3800/api"
+	constructor(private _http: HttpClient){
+		this.url = GLOBAL.url;
+	}
 
-  constructor(private httpClient: HttpClient) {
-    this.url = environment.url;
+	addPublication(token, publication):Observable<any>{
+		let params = JSON.stringify(publication);
+		let headers = new HttpHeaders().set('Content-Type','application/json')
+									   .set('Authorization',token);
 
-   }
+	   return this._http.post(this.url+'publication', params, {headers: headers});
+	}
 
-   // ---- AÑADIR publicaciones
+	getPublications(token, page = 1):Observable<any>{
+		let headers = new HttpHeaders().set('Content-Type','application/json')
+									   .set('Authorization',token);
 
-   addNewPublication(token, publication):Observable<any>{
-     let params = JSON.stringify(publication); //Json convertido a string
-     let headers = new HttpHeaders().set('Content-Type', 'application/json')
-                                    .set('Authorization', token);
-      //Petición por POST al backend + guardado de estos parámetros
-      return this.httpClient.post(this.url + 'publication', params, { headers: headers }); //Petición por POST al backend + guardado de estos parámetros
-    }
+		return this._http.get(this.url+'publications/'+page, {headers: headers});
+	}
 
-    //---- OBTENER publicaciones listada con paginator
+	getPublicationsUser(token, user_id, page = 1):Observable<any>{
+		let headers = new HttpHeaders().set('Content-Type','application/json')
+									   .set('Authorization',token);
 
-    getPublications(token, page = 1):Observable<any>{
-      let headers = new HttpHeaders().set('Content-Type', 'application/json')
-                                      .set('Authorization', token);
-      //Petición por POST al backend + guardado de estos parámetros    
+		return this._http.get(this.url+'publications-user/'+user_id+'/'+page, {headers: headers});
+	}
 
-      return this.httpClient.get(this.url + 'publications/' + page, { headers: headers }); //Petición por GET al backend + guardado de estos parámetros
+	deletePublication(token, id):Observable<any>{
+		let headers = new HttpHeaders().set('Content-Type','application/json')
+									   .set('Authorization',token);
 
-    }
-
-    //---- BORRAR publicaciones ----
-    
-
-    deletePublication(token, id):Observable<any>{
-      let headers = new HttpHeaders().set('Content-Type', 'application/json')
-                                     .set('Authorization', token);
-      //Petición por POST al backend + guardado de estos parámetros    
-
-      return this.httpClient.delete(this.url + 'publications/' + id, { headers: headers }); //Petición por GET al backend + guardado de estos parámetros
-    }
-
+		return this._http.delete(this.url + 'publication/' + id, {headers: headers});
+	}
 }
