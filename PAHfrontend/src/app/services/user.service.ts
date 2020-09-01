@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable'; //Para que funcione suscribe
 import { GLOBAL } from './global';
 import { User } from '../models/user';
 
 @Injectable()
 export class UserService{
-	public url:string;
+	public url:string; //URL de nuestro backend: "localhost:3800/api"
 	public identity;
 	public token;
 	public stats;
@@ -15,47 +15,61 @@ export class UserService{
 		this.url = GLOBAL.url;
 	}
 
+	  //---- REGISTRO ----
+
+
 	register(user: User): Observable<any>{
-		let params = JSON.stringify(user);
+		let params = JSON.stringify(user); //Json convertido a string
 		let headers = new HttpHeaders().set('Content-Type', 'application/json');
 
 		return this._http.post(this.url+'register', params, {headers:headers});
 	}
+
+	    // ---- LOGIN ----
+
 
 	signup(user, gettoken = null): Observable<any>{
 		if(gettoken != null){
 			user.gettoken = gettoken;
 		}
 
-		let params = JSON.stringify(user);
-		let headers = new HttpHeaders().set('Content-Type','application/json');
+		let params = JSON.stringify(user); //convertir el usuario en string
+		let headers = new HttpHeaders().set('Content-Type','application/json'); //Para definir las cabeceras
 
-		return this._http.post(this.url+'login', params, {headers: headers});
+		return this._http.post(this.url+'login', params, {headers: headers}); //Petición por POST al backend + guardado de estos parámetros
 	}
+
+ // --- Sacar la info del usuario del localStorage, utilizando el servicio ----
+
 
 	getIdentity(){
-		let identity = JSON.parse(localStorage.getItem('identity'));
+		let identity = JSON.parse(localStorage.getItem('identity')); //parseamos el string que devuelve a objeto Json dentro de la variable identity
 
 		if(identity != "undefined"){
-			this.identity = identity;
+			this.identity = identity; //Definimos la variable dándole un valor
 		}else{
-			this.identity = null;
+			this.identity = null; //En el caso de que identity no devuelva nada, que sea null
 		}
 
-		return this.identity;
+		return this.identity; //Para que nos devuelva el valor que tenga, sea null o no
 	}
 
-	getToken(){
-		let token = localStorage.getItem('token');
+ // ---- Token ----
 
-		if(token != "undefined"){
-			this.token = token;
+
+	getToken(){ //Conseguir el token guardado en Local Storage
+		let token = localStorage.getItem('token'); //Obtener token
+
+		if(token != "undefined"){ //Si el valor NO es undefined...
+			this.token = token;  // ...nos devuelve el token
 		}else{
 			this.token = null;
 		}
 
 		return this.token;
 	}
+
+	  // ---Estadísticas de usuario ---
 
 	getStats(){
 		let stats = JSON.parse(localStorage.getItem('stats'));
@@ -69,6 +83,9 @@ export class UserService{
 		return this.stats;
 	}
 
+  // ---- CONTADORES ----
+
+
 	getCounters(userId = null): Observable<any>{
 		let headers = new HttpHeaders().set('Content-Type','application/json')
 									   .set('Authorization',this.getToken());
@@ -81,13 +98,19 @@ export class UserService{
 
 	}
 
-	updateUser(user: User):Observable<any>{
+  // ---- ACTUALIZAR/MODIFICAR usuario ----
+
+
+	updateUser(user: User):Observable<any>{ //petición a la API del paginator. Traer lista de usuarios 
 		let params = JSON.stringify(user);
 		let headers = new HttpHeaders().set('Content-Type','application/json')
 									   .set('Authorization',this.getToken());
 
 		return this._http.put(this.url+'update-user/'+user._id, params, {headers: headers});
 	}
+
+	  // ---- Obtener usuarios ----
+
 
 	getUsers(page = null):Observable<any>{
 		let headers = new HttpHeaders().set('Content-Type','application/json')
@@ -96,7 +119,7 @@ export class UserService{
 		return this._http.get(this.url+'users/'+page, {headers: headers});
 	}
 
-	getUser(id):Observable<any>{
+	getUser(id):Observable<any>{ //petición a la API para sacar UN solo usuario (lo usamos en los perfiles)
 		let headers = new HttpHeaders().set('Content-Type','application/json')
 									   .set('Authorization',this.getToken());
 

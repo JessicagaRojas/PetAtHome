@@ -5,14 +5,15 @@ var app = require('./app');
 var port = 3800;
 
 // Conexión Database
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/curso_mean_social', { useMongoClient: true})
+mongoose.Promise = global.Promise; //conexión con la bbdd
+mongoose.connect('mongodb://localhost:27017/petathome', { useMongoClient: true})
 		.then(() => {
-			console.log("La conexión a la base de datos curso_mean_social se ha realizado correctamente!!");
+			console.log("Conexión con la bbdd realizada :D");
 		
-			// Crear servidor
+			//llamamos al método listen de express para que escuche las peticiones http
+
 			app.listen(port, () => {
-				console.log("Servidor corriendo en http://localhost:3800");
+				console.log("servidor arrancado en el puerto 3800 :D");
 			});
 		})
 		.catch(err => console.log(err));

@@ -1,20 +1,22 @@
 'use strict'
 
-//var path = require('path');
-//var fs = require('fs');
+
 var mongoosePaginate = require('mongoose-pagination');
 
 var User = require('../models/user');
 var Follow = require('../models/follow');
 
-function saveFollow(req, res){
+
+    //  ---- SEGUIR A OTRO -----
+
+function postFollow(req, res){
 	var params = req.body;
 
 	var follow = new Follow();
-	follow.user = req.user.sub;
-	follow.followed = params.followed;
+	follow.user = req.user.sub; //guarda el ID del usuario identificado. el que sigue
+	follow.followed = params.followed; //El usuario seguido es el que pasamos por POST
 
-	follow.save((err, followStored) => {
+	follow.save((err, followStored) => { //para guardar el seguimiento
 		if(err) return res.status(500).send({message: 'Error al guardar el seguimiento'});
 
 		if(!followStored) return res.status(404).send({message: 'El seguimiento no se ha guardado'});
@@ -24,11 +26,14 @@ function saveFollow(req, res){
 
 }
 
-function deleteFollow(req, res){
-	var userId = req.user.sub;
-	var followId = req.params.id;
+    //  ---- BORRAR FOLLOW -----
 
-	Follow.find({'user':userId, 'followed':followId}).remove(err => {
+
+function deleteFollow(req, res){
+	var userId = req.user.sub; //Recoger al usuario que está logeado
+	var followId = req.params.id; //Usuario al que dejamos de seguir
+
+	Follow.find({'user':userId, 'followed':followId}).remove(err => { //Pasar Id's de ambos usuarios por URL
 		if(err) return res.status(500).send({message: 'Error al dejar de seguir'});
 
 		return res.status(200).send({message: 'El follow se ha eliminado!!'});
@@ -36,33 +41,39 @@ function deleteFollow(req, res){
 }
 
 
-function getFollowingUsers(req, res){
-	var userId = req.user.sub;
+    //  ---- LISTAR USUARIOS SEGUIDOS. PAGINATION -----
 
-	if(req.params.id && req.params.page){
+
+
+function getFollowingUsers(req, res){
+	var userId = req.user.sub; //lo primero es identificar al usuario
+
+	if(req.params.id && req.params.page){ //comprobar que nos llega un ID de usuario logeado por URL y un número de páginas
 		userId = req.params.id;
 	}
 
-	var page = 1;
+	var page = 1; //crear variable por defecto 1
 	
-	if(req.params.page){
-		page = req.params.page;
-	}else{
+	if(req.params.page){ //Si nos llega página por URL...
+		page = req.params.page; //Si nos llega, actualizamos el valor por defecto
+
+	}else{ //Si no existen páginas
 		page = req.params.id;
 	}
 
-	var itemsPerPage = 4;
+	var itemsPerPage = 6;
 
-	Follow.find({user:userId}).populate({path: 'followed'}).paginate(page, itemsPerPage, (err, follows, total) => {
+
+	Follow.find({user:userId}).populate({path: 'followed'}).paginate(page, itemsPerPage, (err, follows, total) => { //Para buscar todos los follows a los que sigue el user logeado
 		if(err) return res.status(500).send({message: 'Error en el servidor'});
 
 		if(!follows) return res.status(404).send({message: 'No estas siguiendo a ningun usuario'});
 
 		followUserIds(req.user.sub).then((value) => {
-			return res.status(200).send({
+			return res.status(200).send({ //en el caso de que todo vaya bien, devolvemos...
 				total: total,
-				pages: Math.ceil(total/itemsPerPage),
-				follows,
+				pages: Math.ceil(total/itemsPerPage), //Calcula el total de páginas
+				follows, //Esto crea la propiedad con toda la info dentro
 				users_following: value.following,
 				users_follow_me: value.followed,
 			});
@@ -99,34 +110,38 @@ async function followUserIds(user_id){
 	}
 }
 
+    //  ---- LISTAR USUARIOS QUE NOS SIGUEN. PAGINATION -----
 
-function getFollowedUsers(req, res){
+
+function getFollowedUsers(req, res){ //lo primero es identificar al usuario 
 	var userId = req.user.sub;
 
-	if(req.params.id && req.params.page){
+	if(req.params.id && req.params.page){ //comprobar que nos llega un ID de usuario logeado por URL y un número de páginas
 		userId = req.params.id;
 	}
 
-	var page = 1;
+	var page = 1; //crear variable por defecto 1
 	
-	if(req.params.page){
-		page = req.params.page;
-	}else{
+	if(req.params.page){ //Si nos llega página por URL...
+		page = req.params.page; //Si nos llega, actualizamos el valor por defecto
+
+
+	}else{ //Si no existen páginas
 		page = req.params.id;
 	}
 
-	var itemsPerPage = 4;
+	var itemsPerPage = 6;
 
-	Follow.find({followed:userId}).populate('user').paginate(page, itemsPerPage, (err, follows, total) => {
+	Follow.find({followed:userId}).populate('user').paginate(page, itemsPerPage, (err, follows, total) => { //Para buscar todos los usuarios que siguen al user registrado
 		if(err) return res.status(500).send({message: 'Error en el servidor'});
 
 		if(!follows) return res.status(404).send({message: 'No te sigue ningun usuario'});
 
 		followUserIds(req.user.sub).then((value) => {
-			return res.status(200).send({
+			return res.status(200).send({ //en el caso de que todo vaya bien, devolvemos...
 				total: total,
-				pages: Math.ceil(total/itemsPerPage),
-				follows,
+				pages: Math.ceil(total/itemsPerPage), //Calcula el total de páginas
+				follows, //Esto crea la propiedad con toda la info dentro
 				users_following: value.following,
 				users_follow_me: value.followed,
 			});
@@ -134,7 +149,9 @@ function getFollowedUsers(req, res){
 	});
 }
 
-// Devolver listados de usuarios
+            //  ---- DEVOLVER LISTADO MYFOLLOWS -----
+
+
 function getMyFollows(req, res){
 	var userId = req.user.sub;
 
@@ -156,7 +173,7 @@ function getMyFollows(req, res){
 
 
 module.exports = {
-	saveFollow,
+	postFollow,
 	deleteFollow,
 	getFollowingUsers,
 	getFollowedUsers,

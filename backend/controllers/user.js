@@ -1,35 +1,32 @@
 'use strict'
-var bcrypt = require('bcrypt-nodejs');
-var mongoosePaginate = require('mongoose-pagination');
-var fs = require('fs');
-var path = require('path');
 
-var User = require('../models/user');
+
+var bcrypt = require('bcrypt-nodejs'); //requerimos bcrypt para cifrar las contraseñas (token)
+var mongoosePaginate = require('mongoose-pagination');
+var fs = require('fs'); //librería "file system" de Node para trabajar con archivos (imágenes)
+var path = require('path'); //librería para trabajar con rutas del sistema de ficheros
+
+
+// --- MODELOS ---
+
+var User = require('../models/user'); //cargamos el modelo de usuario. los controladores en mayúsculas
 var Follow = require('../models/follow');
 var Publication = require('../models/publication');
-var jwt = require('../services/jwt');
+var jwt = require('../services/jwt'); //cargamos el fichero del token
 
-// Métodos de prueba
-function home(req, res){
-	res.status(200).send({
-		message: 'Hola mundo desde el servidor de NodeJS'
-	});
-}
 
-function pruebas(req, res){
-	console.log(req.body);
-	res.status(200).send({
-		message: 'Acción de pruebas en el servidor de NodeJS'
-	});
-}
 
-// Registro
-function saveUser(req, res){
-	var params = req.body;
-	var user = new User();
+    //   ------ REGISTRO   ------
+
+
+function postUser(req, res){
+	var params = req.body; //recoge parámetros de POST
+	var user = new User(); //variable para crear nuevos usuarios
 
 	if(params.name && params.surname && 
-	   params.nick && params.email && params.password){
+	   params.nick && params.email && params.password){ //si nos llegan todos estos parámetros, pasamos a setear los datos al objeto del usuario
+
+
 
 		user.name = params.name;
 		user.surname = params.surname;
@@ -38,27 +35,34 @@ function saveUser(req, res){
 		user.role = 'ROLE_USER';
 		user.image = null;
 
+
+		//$or es para que busque si se cumplen las condiciones que le describa
 		// Controlar usuarios duplicados
-		User.find({ $or: [
+		User.find({ $or: [ //función para que no se puedan repetir usuarios (user ni email)
 				 {email: user.email.toLowerCase()},
 				 {nick: user.nick.toLowerCase()}
-		 ]}).exec((err, users) => {
+
+		 ]}).exec((err, users) => { // función de callback para resolver en ambos casos (true y false)
 		 	if(err) return res.status(500).send({message: 'Error en la petición de usuarios'});
 
-		 	if(users && users.length >= 1){
-		 		return res.status(200).send({message: 'El usuario que intentas registrar ya existe!!'});
-		 	}else{
+		 	if(users && users.length >= 1){ //Si el usuario es mayor que 1, devolvemos esto:
+				 return res.status(200).send({message: 'El usuario ya existe, prueba con otro'});
+				 
 
-		 		// Cifra la password y me guarda los datos 
-				bcrypt.hash(params.password, null, null, (err, hash) => {
+		 	}else{  //Si el usuario no está repetido, entonces cifrará la contraseña y pasamos a la sig función
+
+
+				bcrypt.hash(params.password, null, null, (err, hash) => { //hash es la contraseña generada y err el posible error
 					user.password = hash;
 
 					user.save((err, userStored) => {
 						if(err) return res.status(500).send({message: 'Error al guardar el usuario'});
+						 //con este return nos ahorramos tener que anidar más if
 
-						if(userStored){
+						if(userStored){ //para devolver el usuario en caso de que esté almacenado OK
 							res.status(200).send({user: userStored});
-						}else{
+
+						}else{ //en caso de que no exista ese User almacenado
 							res.status(404).send({message: 'No se ha registrado el usuario'});
 						}
 
@@ -67,60 +71,72 @@ function saveUser(req, res){
 
 		 	}
 		 });
-		
-	}else{
+
+
+	//hacemos un else para el caso de que no nos lleguen todos los parámetros o haya algún error
+	}else{ //en caso de que todos los parámetros que pusimos en el primer IF no se cumplan
 		res.status(200).send({
-			message: 'Envia todos los campos necesarios!!'
+			message: 'Es imprescindible que rellenes todos los campos'
 		});
 	}
 }
 
-// Login
-function loginUser(req, res){
-	var params = req.body;
 
+ //   ------ LOGIN   ------
+
+
+function loginUser(req, res){
+	var params = req.body; //primero una variable para recoger los datos de POSTMAN
 	var email = params.email;
 	var password = params.password;
 
-	User.findOne({email: email}, (err, user) => {
+
+	User.findOne({email: email}, (err, user) => { //método para buscar una coincidencia en usuarios + emails
 		if(err) return res.status(500).send({message: 'Error en la petición'});
 
-		if(user){
+		if(user){ //comparar la password con bcrypt
+
 			bcrypt.compare(password, user.password, (err, check) => {
-				if(check){
+				if(check){ //si check es correcto, devolvemos los datos del usuario
 					
-					if(params.gettoken){
-						//generar y devolver token
+					if(params.gettoken){ //devolver token encriptado en caso de true
+
 						return res.status(200).send({
-							token: jwt.createToken(user)
+							token: jwt.createToken(user) //le paso el objeto usuario
 						});
-					}else{
+
+					}else{ 
 						//devolver datos de usuario
-						user.password = undefined;
+						user.password = undefined; //ocultar la password que nos devuelve POSTMAN
 						return res.status(200).send({user});
 					}
 					
-				}else{
-					return res.status(404).send({message: 'El usuario no se ha podido identificar'});
+				}else{ //si el check no encuentra 
+					return res.status(404).send({message: 'El usuario no se encuentra'});
 				}
 			});
+
 		}else{
 			return res.status(404).send({message: 'El usuario no se ha podido identificar!!'});
 		}
 	});
 }
 
-// Conseguir datos de un usuario
-function getUser(req, res){
-	var userId = req.params.id;
+ // ---- BUSCAR USUARIOS Y SUS DATOS -----
 
-	User.findById(userId, (err, user) => {
+
+function getUser(req, res){
+	var userId = req.params.id; //recogemos el ID del usuario. "params" lo usamos para parámetros que nos llegan por URL
+	// cuando nos llegan por POST o GET usamos "body"
+
+
+	User.findById(userId, (err, user) => { //callback para la consulta a la bbdd
 		if(err) return res.status(500).send({message: 'Error en la petición'});
 
 		if(!user) return res.status(404).send({message: 'El usuario no existe'});
 
 		followThisUser(req.user.sub, userId).then((value) => {
-			user.password = undefined;
+			user.password = undefined; //Para que no devuelva la password en el Json
 
 			return res.status(200).send({
 				user,
@@ -132,38 +148,47 @@ function getUser(req, res){
 	});
 }
 
+
+  // ---- FUNCIÓN ASÍNCRONA para saber quién me sigue -----
+
+
 async function followThisUser(identity_user_id, user_id){
-	var following = await Follow.findOne({"user":identity_user_id, "followed":user_id}).exec((err, follow) => {
+	var following = await Follow.findOne({"user":identity_user_id, "followed":user_id}).exec((err, follow) => { //Para comprobar si seguimos a X usuario
 			if(err) return handleError(err); 
-			return follow;
+			return follow; //Esta variable guarda dentro el resultado que devuelve el findone
 		});
 
-	var followed = await Follow.findOne({"user":user_id, "followed":identity_user_id}).exec((err, follow) => {
-			if(err) return handleError(err); 
-			return follow;
+
+	var followed = await Follow.findOne({"user":user_id, "followed":identity_user_id}).exec((err, follow) => { //Para comprobar si seguimos a X usuario
+			if(err) return handleError(err);  
+			return follow; //Esta variable guarda dentro el resultado que devuelve el findOne. Al contrario que la anterior, ahora para saber si me sigue
 		});
 
-	return {
+	return { //Devolvemos un Json
 		following: following,
 		followed: followed
 	}
 }
 
-// Devolver un listado de usuarios paginado
-function getUsers(req, res){
-	var identity_user_id = req.user.sub;
+ //  ---- PAGINATION -----
+
+
+function getUsers(req, res){ //Recibe por URL un número de página con los usuarios listados
+	var identity_user_id = req.user.sub; //hace referencia al usuario logeado
 
 	var page = 1;
 	if(req.params.page){
 		page = req.params.page;
 	}
 
-	var itemsPerPage = 5;
+	var itemsPerPage = 6; //Cuántos usuarios se van a mostrar por página
 
 	User.find().sort('_id').paginate(page, itemsPerPage, (err, users, total) => {
+		//el total es un contador que saca el total de registros aunque salgan solo x por página
+
 		if(err) return res.status(500).send({message: 'Error en la petición'});
 
-		if(!users) return res.status(404).send({message: 'No hay usuarios disponibles'});
+		if(!users) return res.status(404).send({message: 'Usuarios no encontrados'});
 
 		followUserIds(identity_user_id).then((value) => {
 			
@@ -180,27 +205,40 @@ function getUsers(req, res){
 	});	
 }
 
+  //  ---- DEVOLVER ARRAY's de usuarios seguidos y que nos siguen -----
+
+
+
 async function followUserIds(user_id){
 	var following = await Follow.find({"user":user_id}).select({'_id':0, '__v':0, 'user':0}).exec((err, follows) => {
+		//En select se definen los campos que no queremos que lleguen, solo nos interesa el Id de usuario que estoy siguiendo como user logeado
+
+
 		return follows;
 	});
 
 	var followed = await Follow.find({"followed":user_id}).select({'_id':0, '__v':0, 'followed':0}).exec((err, follows) => {
+		//En select se definen los campos que no queremos que lleguen, solo nos interesa el Id de usuario que estoy siguiendo como user logeado
+
 		return follows;
 	});
 
-	// Procesar following ids
+
+    //PROCESAR FOLLOWING IDs
+
 	var following_clean = [];
 
 	following.forEach((follow) => {
-		following_clean.push(follow.followed);
+		following_clean.push(follow.followed); //Obtener array limpio de Ids
 	});
 	
-	// Procesar followed ids
+
+	//PROCESAR FOLLOWED IDs
+
 	var followed_clean = [];
 
 	followed.forEach((follow) => {
-		followed_clean.push(follow.user);
+		followed_clean.push(follow.user); //Obtener array limpio de Ids
 	});
 	
 	return {
@@ -208,6 +246,9 @@ async function followUserIds(user_id){
 		followed: followed_clean
 	}
 }
+
+   //  ---- CONTADOR DE USERS -----
+
 
 
 function getCounters(req, res){
@@ -222,7 +263,7 @@ function getCounters(req, res){
 }
 
 async function getCountFollow(user_id){
-	var following = await Follow.count({"user":user_id}).exec((err, count) => {
+	var following = await Follow.count({"user":user_id}).exec((err, count) => { //Si el usuario coincide ejectua la consulta y el contador
 		if(err) return handleError(err);
 		return count;
 	});
@@ -231,6 +272,9 @@ async function getCountFollow(user_id){
 		if(err) return handleError(err);
 		return count;
 	});
+
+
+    //variable para que me devuelva el total de publicaciones que hemos hecho
 
 	var publications = await Publication.count({"user":user_id}).exec((err, count) => {
 		if(err) return handleError(err);
@@ -244,16 +288,18 @@ async function getCountFollow(user_id){
 	}
 }
 
-// Edición de datos de usuario
-function updateUser(req, res){
-	var userId = req.params.id;
-	var update = req.body;
+  //  ---- ACTUALIZAR DATOS DE USUARIO -----
 
-	// borrar propiedad password
-	delete update.password;
 
-	if(userId != req.user.sub){
-		return res.status(500).send({message: 'No tienes permiso para actualizar los datos del usuario'});
+  function updateUser(req, res){
+	var userId = req.params.id; //Recoge la ID de la URL
+	var update = req.body; //recoge y sustituye los datos nuevos
+
+	delete update.password; //objeto predeterminado. Borra la propiedad password
+
+
+	if(userId != req.user.sub){ //si los datos del user no coinciden, no puede identificarse y por lo tanto no puede modificar
+		return res.status(500).send({message: 'No tienes permiso para modificar datos'});
 	}
 
 	User.find({ $or: [
@@ -280,11 +326,14 @@ function updateUser(req, res){
 
 }
 
-// Subir archivos de imagen/avatar de usuario
-function uploadImage(req, res){
+
+    //  ---- AVATAR DE USUARIO -----
+
+
+	function uploadImage(req, res){
 	var userId = req.params.id;
 
-	if(req.files){
+	if(req.files){ //si existe files (fichero) se puede subir
 		var file_path = req.files.image.path;
 		console.log(file_path);
 		
@@ -297,13 +346,16 @@ function uploadImage(req, res){
 		var ext_split = file_name.split('\.');
 		console.log(ext_split);
 
-		var file_ext = ext_split[1];
+		var file_ext = ext_split[1]; //El 1 hace referencia a la extensión de la imagen subida
 		console.log(file_ext);
 
-		if(userId != req.user.sub){
-			return removeFilesOfUploads(res, file_path, 'No tienes permiso para actualizar los datos del usuario');
+		if(userId != req.user.sub){ //si los datos del user no coinciden, no puede identificarse y por lo tanto no puede subir foto en su perfil
+			return removeFilesOfUploads(res, file_path, 'No tienes permiso para actualizar los datos');
+			//llamamos a la función auxiliar definida al final del fichero para eliminar la imagen en caso de no coincidir extensión
 		}
 
+
+		//Si la imagen coincide con las extensiones que detallo abajo, se subirá
 		if(file_ext == 'png' || file_ext == 'jpg' || file_ext == 'jpeg' || file_ext == 'gif'){
 			 
 			 // Actualizar documento de usuario logueado
@@ -312,11 +364,11 @@ function uploadImage(req, res){
 
 				if(!userUpdated) return res.status(404).send({message: 'No se ha podido actualizar el usuario'});
 
-				return res.status(200).send({user: userUpdated});
+				return res.status(200).send({user: userUpdated}); //si todo va bien, devolvemos el objeto modificado
 			 });
 
 		}else{
-			return removeFilesOfUploads(res, file_path, 'Extensión no válida');
+			return removeFilesOfUploads(res, file_path, 'Extensión no válida'); //llamamos a la función auxiliar definida al final del fichero para eliminar la imagen en caso de no coincidir extensión
 		}
 
 	}else{
@@ -325,18 +377,21 @@ function uploadImage(req, res){
 }
 
 function removeFilesOfUploads(res, file_path, message){
-	fs.unlink(file_path, (err) => {
-		return res.status(200).send({message: message});
+	fs.unlink(file_path, (err) => { //Para eliminar el fichero si es incorrecto
+		return res.status(200).send({message: message}); 
 	});
 }
 
-function getImageFile(req, res){
-	var image_file = req.params.imageFile;
+    //  ---- DEVOLVER IMÁGENES DE USUARIO -----
+
+
+function getfiles(req, res){ //"buscar" "obtener" los avatares de los usuarios
+	var image_file = req.params.imageFile; //recibe el método por URL
 	var path_file = './uploads/users/'+image_file;
 
 	fs.exists(path_file, (exists) => {
 		if(exists){
-			res.sendFile(path.resolve(path_file));
+			res.sendFile(path.resolve(path_file)); //devolver el fichero "en crudo"
 		}else{
 			res.status(200).send({message: 'No existe la imagen...'});
 		}
@@ -344,14 +399,12 @@ function getImageFile(req, res){
 }
 
 module.exports = {
-	home,
-	pruebas,
-	saveUser,
+	postUser,
 	loginUser,
 	getUser,
 	getUsers,
 	getCounters,
 	updateUser,
 	uploadImage,
-	getImageFile
+	getfiles
 }

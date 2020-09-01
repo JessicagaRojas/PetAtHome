@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable'; //Para que funcione suscribe
 import { GLOBAL } from './global';
 import { Follow } from '../models/follow';
 
@@ -12,19 +12,25 @@ export class FollowService{
 		this.url = GLOBAL.url;
 	}
 
+
+	  // --- Guardar follow en la bbdd ----
+
 	addFollow(token, follow):Observable<any>{
 		let params = JSON.stringify(follow);
 		let headers = new HttpHeaders().set('Content-Type', 'application/json')
 									   .set('Authorization', token);
 
-	 	return this._http.post(this.url+'follow', params, {headers: headers});
+	 	return this._http.post(this.url+'follow', params, {headers: headers}); 
 	}
+
+	 // ---- Borrar follow ----
+
 
 	deleteFollow(token, id):Observable<any>{
 		let headers = new HttpHeaders().set('Content-Type', 'application/json')
 									   .set('Authorization', token);
 
-		return this._http.delete(this.url+'follow/'+id, {headers: headers});
+		return this._http.delete(this.url+'follow/'+id, {headers: headers}); //follow + id como parámetro
 	}
 
 	getFollowing(token, userId = null, page = 1):Observable<any>{
