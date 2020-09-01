@@ -11,6 +11,7 @@ import { GLOBAL } from '../../../services/global';
 @Component({
 	selector: 'add',
 	templateUrl: './add.component.html',
+
 	providers: [FollowService, MessageService]
 })
 export class AddComponent implements OnInit{
