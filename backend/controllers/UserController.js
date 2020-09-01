@@ -9,23 +9,12 @@ let Follows = require('../models/follow');
 let Publication = require('../models/publication');
 let jwt = require('../services/token'); //cargamos el fichero del token
 
-function home(req, res){
-    res.status(200).send({
-        message: ''
-    });
-}
 
-function pruebas(req, res){
-    console.log(req.body);
-    res.status(200).send({
-        message: 'Acción de prueba con NodeJs'
-    });
-}
 
     //   ------ REGISTRO   ------
 
 
-function saveUser(req, res){
+function postNewUser(req, res){
     let params = req.body; //recoge parámetros de POST
     let user = new User(); //variable para crear nuevos usuarios
 
@@ -136,10 +125,17 @@ function saveUser(req, res){
 
             followThisUser(req.user.sub, userId).then((value) => {
                 user.password = undefined; //Para que no devuelva la password en el Json
-                return res.status(200).send({user, 
+
+                return res.status(200).send({
+                    user,
+                    following: value.following, 
+                    followed: value.followed
+                });
+             /*   return res.status(200).send({user, 
                                             following: value.following,
                                             followed: value.followed}); 
-            });
+            });*/
+         });
     });
 
  }
@@ -181,7 +177,7 @@ function saveUser(req, res){
         page = req.params.page;
     }
 
-    let itemsPerPage = 5; //Cuántos usuarios se van a mostrar por página
+    let itemsPerPage = 6; //Cuántos usuarios se van a mostrar por página
 
     User.find().sort('_id').paginate(page, itemsPerPage, (err, users, total) => { 
         //el total es un contador que saca el total de registros aunque salgan solo x por página
@@ -246,7 +242,7 @@ function saveUser(req, res){
    //  ---- CONTADOR DE USERS -----
 
 
- function getCounters(req, res){
+ function getUsersCounter(req, res){
     let userId = req.user.sub;
 
 
@@ -301,6 +297,30 @@ function saveUser(req, res){
           return res.status(500).send({message: 'No tienes permiso para modificar datos'});
      }
 
+
+     User.find({ $or: [
+             {email: update.email.toLowerCase()},
+             {nick: update.nick.toLowerCase()}
+        ]}).exec((err, users) => {
+
+         var user_isset = false;
+         users.forEach((user) => {
+           if(user && user._id != userId) user_isset = true;
+         });
+
+        if(user_isset) return res.status(404).send({message: 'Los datos ya están en uso'});
+        
+        User.findByIdAndUpdate(userId, update, {new:true}, (err, userUpdated) => {
+        if(err) return res.status(500).send({message: 'Error en la petición'});
+
+        if(!userUpdated) return res.status(404).send({message: 'No se ha podido actualizar el usuario'});
+
+        return res.status(200).send({user: userUpdated});
+       });
+
+    });
+
+     /*
       User.findByIdAndUpdate(userId, update, {new:true}, (err, userUpdate) => { //si todo va bien
 
         if(err) return res.status(500).send({message: 'No tienes permiso para modificar datos'});
@@ -309,14 +329,14 @@ function saveUser(req, res){
 
         return res.status(200).send({user: userUpdated}); //si todo va bien, devolvemos el objeto modificado
 
-      });
+      }); */
 
   }
 
     //  ---- AVATAR DE USUARIO -----
 
     function uploadImage(req, res){
-        var userId = req.params.id;
+        let userId = req.params.id;
 
        if(req.files){ //si existe files (fichero) se puede subir
             let file_path = req.files.image.path;
@@ -364,7 +384,8 @@ function saveUser(req, res){
 
     //  ---- DEVOLVER IMÁGENES DE USUARIO -----
 
-    function getImageFile(req, res){ //"buscar" "obtener" los avatares de los usuarios
+
+    function getFiles(req, res){ //"buscar" "obtener" los avatares de los usuarios
         let image_file = req.params.imageFile; //recibe el método por URL
         let path_file = './uploads/users/'+image_file;
 
@@ -383,14 +404,12 @@ function saveUser(req, res){
 
 
 module.exports = {
-    home,
-    pruebas,
-    saveUser,
+    postNewUser,
     loginUser,
     getUser,
     getUsers,
-    getCounters,
+    getUsersCounter,
     updateUser,
     uploadImage,
-    getImageFile
+    getFiles
 }

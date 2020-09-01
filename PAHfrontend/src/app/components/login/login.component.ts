@@ -40,13 +40,32 @@ export class LoginComponent implements OnInit {
     console.log('Componente cargando...');
 
     this.formLogin = this.formBuilder.group({
-      email: ['dieguen@gmail.com', Validators.required],
-      password: ['1234', Validators.required],
+      email: ['', Validators.required],
+      password: ['', Validators.required],
       gettoken: [true, Validators.required]
     });
   }
 
   onSubmit() {
+    // Llamar al backend
+    this.userService.signup(this.formLogin.value).subscribe( data => {
+      console.log(data);
+      this.identity = data.user;
+      alert("¡Dentro! :D ");
+      sessionStorage.setItem('token', data.token)
+      this._router.navigateByUrl('/');
+    },
+    error => {
+      alert( error.message);
+    },() => {
+      // No errors, route to new page
+    }
+  );
+	}
+  
+
+
+  /*
     // Llamar al backend
     this.userService.signup(this.formLogin.value).subscribe( data => {
         console.log(data);
@@ -60,82 +79,53 @@ export class LoginComponent implements OnInit {
       },() => {
         // No errors, route to new page
       }
-    );
+    );*/
 
-      if(!this.identity || !this.identity._id){
+
+
+
+
+getToken(){
+  this.userService.signup(this.user, 'true').subscribe(
+    response => {
+      this.token = response.token;
+      
+      console.log(this.token);
+
+      if(this.token.length <= 0){
         this.status = 'error';
       }else{
-        this.status = 'success'; 
-        //PERSISTIR datos del usuario
-        localStorage.setItem('identity', JSON.stringify(this.identity));
-  
-        //TOKEN
-        this.getToken();
-  }
-}
-/*
-error => {
-  var errorMessage = <any>error;
-  console.log(errorMessage);
+        
+        // PERSISTIR TOKEN DEL USUARIO
+        localStorage.setItem('token',this.token);
 
-  if(errorMessage != null){
-    this.status = 'error';
-  } 
-}*/
+        // Conseguir los contadores o estadisticas del usuario
+        this.getCounters();
+      }
+      
+    },
+    error => {
+      var errorMessage = <any>error;
+      console.log(errorMessage);
 
-
-  getToken(){
-    this.userService.signup(this.user, 'true').subscribe(
-      response => {
-        this.token = response.token;
-    
-        if(this.token <= 0){
-          this.status = 'error';
-        }else{
-          this.status = 'success'; 
-          //PERSISTIR datos del usuario en Local Storage
-          localStorage.setItem('token',this.token); //En LocalStorage no puedes guardar objetos de JS, hay que convertirlo en Json string
-
-          this.getToken(); //Conseguir token mediante petición AJAX
-
-          //Redirección a la home tras logout
-          this._router.navigate(['/']);
+      if(errorMessage != null){
+        this.status = 'error';
+      }
     }
-  }
-)}
+  );
 }
 
-
-/*
-error => {
-  var errorMessage = <any>error;
-  console.log(errorMessage);
-
-  if(errorMessage != null){
-    this.status = 'error';
-  
-  }
-}
-  };
-
-}
-*/
-
-
-/*
-this.userService.signup(this.user).subscribe(
-  response => {
-    this.identity = response.user;
-
-    if(!this.identity || !this.identity._id){
-      this.status = 'error';
-    }else{
-      this.status = 'success'; //PERSISTIR datos del usuario
-
-      //TOKEN
-
-
+getCounters(){
+  this.userService.getCounters().subscribe(
+    response => {
+      localStorage.setItem('stats', JSON.stringify(response));
+      this.status = 'success';
+      this._router.navigate(['/']);
+    },
+    error => {
+      console.log(<any>error);
     }
-  }
-  this.status = 'success';
- */
+  )
+
+}
+}

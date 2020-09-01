@@ -11,11 +11,11 @@ let PublicationController = require('../controllers/PublicationController');
 // ---- RUTAS ----
 
 api.get('/probando-pub', middleware_auth.ensureAuth, PublicationController.probando);
-api.post('/publication', middleware_auth.ensureAuth, PublicationController.savePublication);
+api.post('/publication', middleware_auth.ensureAuth, PublicationController.postPublication);
 api.get('/publications/:page?', middleware_auth.ensureAuth, PublicationController.getPublications);
 api.get('/publication/:id', middleware_auth.ensureAuth, PublicationController.getOnePublication);
 api.delete('/publication/:id', middleware_auth.ensureAuth, PublicationController.deletePublication);
 api.post('upload-image-publications/:id', [middleware_auth.ensureAuth, md_upload], PublicationController.uploadImage);
-api.get('/get-image-publications/:imageFile', middleware_auth.ensureAuth, PublicationController.getImageFile);
+api.get('/get-image-publications/:imageFile', middleware_auth.ensureAuth, PublicationController.getUserImage);
 
 module.exports = api;

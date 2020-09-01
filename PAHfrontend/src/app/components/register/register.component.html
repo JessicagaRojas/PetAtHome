@@ -1,20 +1,10 @@
+<router-outlet></router-outlet>
 
 
 <div>
-    <!-- onsubmit es un método de Angular para pasarle acciones -->
-    <div class="contenedor-logo-registro">
-        <ul class="lista-registro">
-            <li class="lista-registro">Tu alternativa a las residencias de mascotas</li>
-            <li class="lista-registro">Cuidadores de confianza en tu ciudad</li>
-            <li class="lista-registro">Sin jaulas...</li>
-            <li class="lista-registro">...y con mucho amor!</li>
-        </ul>
-    </div>
 
-    <!-- <img id="logo-PAH-registro" src="../../../assets/IMG/lofo_PAH.png" alt="" width="800px" height="450px"> -->
-    <h1 class="h1-strong">{{title}}</h1>
 
-    <mat-card>
+    <mat-card class="contenedor-form-registro">
         <form [formGroup]="formUser" class="register-form">
             <div>
                 <mat-form-field class="example-form-field">
@@ -58,7 +48,12 @@
                 <span *ngIf="!formUser.controls.password.valid && formUser.controls.password.touched">La contraseña es obligatoria!</span>
             </div>
 
-            <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!formUser.valid" [routerLink]="['/login']">Enviar formulario</button>
+            <button mat-raised-button color="primary" id="btn-sub-reg" (click)="onSubmit()" [disabled]="!formUser.valid" [routerLink]="['/login']">Enviar formulario</button>
+ 
+            <h1 id="texto-registro" >Tu mejor alternativa a las residencias de mascotas</h1>
+
+            <img id="registrate-imagen" src="../../../assets/IMG/registrate.png" alt="" width="550px" height="500px">
+
 
 
         </form>

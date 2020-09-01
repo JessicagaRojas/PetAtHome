@@ -3,6 +3,8 @@
 
 let mongoose = require('mongoose');
 let Schema = mongoose.Schema;
+
+
 let FollowSchema = Schema({
      //Json con sus propiedades. El campo ID es automático
      user: { type: Schema.ObjectId, ref:'User' },

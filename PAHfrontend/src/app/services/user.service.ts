@@ -102,6 +102,30 @@ export class UserService {
     
   }
 
+  // ---- CONTADORES ----
+
+	getCounters(userId = null): Observable<any>{
+		let headers = new HttpHeaders().set('Content-Type','application/json')
+									   .set('Authorization',this.getToken());
+
+		if(userId != null){
+			return this.httpClient.get(this.url+'counters/'+userId, {headers: headers});
+		}else{
+			return this.httpClient.get(this.url+'counters', {headers: headers});
+		}
+
+  }
+
+  // ---- ACTUALIZAR/MODIFICAR usuario ----
+/*
+	updateUser(user: User):Observable<any>{
+		let params = JSON.stringify(user);
+		let headers = new HttpHeaders().set('Content-Type','application/json')
+									   .set('Authorization',this.getToken());
+
+		return this.httpClient.put(this.url+'update-user/'+userId, params, {headers: headers});
+  }
+  */
 
 
 }

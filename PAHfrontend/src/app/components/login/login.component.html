@@ -1,52 +1,38 @@
 <router-outlet></router-outlet>
 
 
-<mat-card>
-    <form [formGroup]="formLogin" class="login-form">
-        <div>
+<mat-card >
+    <div class="container-login">
+    <form [formGroup]="formLogin" >
+
+        <div class="login-form">
+
         <mat-form-field class="example-form-field">
             <mat-label>Email</mat-label>
             <input matInput type="text" formControlName="email" required
                 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
         </mat-form-field>
+
         <span *ngIf="!formLogin.controls.email.valid && formLogin.controls.email.touched" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">El email no es válido!</span>
     </div>
 
+
+
     <div>
-        <mat-form-field class="example-form-field">
+        <mat-form-field class="example-form-field" id="password-field">
             <mat-label>Password</mat-label>
             <input matInput type="text" formControlName="password" required>
         </mat-form-field>
         <span *ngIf="!formLogin.controls.password.valid && formLogin.controls.password.touched">La contraseña es obligatoria!</span>
     </div>
 
-        <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!formLogin.valid" [routerLink]="['/timeline']">Enviar</button>
+        <button mat-raised-button color="primary" id="btn-sub-log" (click)="onSubmit()" [disabled]="!formLogin.valid" [routerLink]="['/timeline']">Enviar</button>
 
     </form>
+
+    <h1 id="texto-login" >Cuidadores cerca de tí. Sin jaulas</h1>
+
+    <img id="logeate-imagen" src="../../../assets/IMG/logeate.png" alt="" width="450px" height="400px">
+
+</div>
 </mat-card>
-
-<!--
-    <div>
-        <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
-            <p>
-                <label>Email</label>
-                <input type="email" name="email" #email="ngModel" [(ngModel)]="user.email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"/>
-                <span *ngIf="!email.valid && email.touched">El email no es correcto</span>
-
-    
-            </p>
-
-
-            <p>
-                <label>Contraseña</label>
-                <input type="password" name="password" #password="ngModel" [(ngModel)]="user.password" required />
-                <span *ngIf="!password.valid && password.touched">La contrasela es obligatoria!</span>
-                
-    
-            </p>
-
-            <input type="submit" value="Entrar" class="btn-succes [disabled]="!loginForm.form.valid />
-        </form>
-    </div>
-
--->
